@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from academics.models import AcademicClass
+from academics.models import AcademicClass, Department
 
 # Create your models here.
 class Profile(models.Model):
@@ -12,6 +12,13 @@ class Profile(models.Model):
 
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     role=models.CharField(max_length=20,choices=ROLE_CHOICES)
+    department = models.ForeignKey(
+    Department,
+    on_delete=models.PROTECT,
+    null=True,
+    blank=True
+)
+
     academic_class=models.ForeignKey(AcademicClass, on_delete=models.PROTECT, null=True,blank=True)
     phone=models.CharField(max_length=10,blank=True)
     bio=models.TextField(blank=True)
