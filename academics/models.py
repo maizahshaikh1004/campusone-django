@@ -186,4 +186,108 @@ class AttendanceRecord(models.Model):
             f"{'Present' if self.is_present else 'Absent'}"
         )
 
+class AttendanceCorrectionRequest(models.Model):
+    STATUS_CHOICES=(
+        ("PENDING","Pending"),
+        ("APPROVED","Approved"),
+        ("REJECTED","Rejected")
+    )
+    attendance_record=models.ForeignKey(AttendanceRecord, on_delete=models.CASCADE)
+    faculty=models.ForeignKey("users.Profile",on_delete=models.PROTECT)
+    reason=models.TextField()
+    requested_is_present=models.BooleanField()
+    status=models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
+    admin_remark=models.TextField(blank=True)
+    requested_at=models.DateTimeField(auto_now_add=True)
+    reviewed_at=models.DateTimeField(blank=True,null=True)
+
+    def clean(self):
+        if self.faculty.role!="FACULTY":
+            raise ValidationError("Only faculty can raise attendance correction requests.")
+
+        attendance_faculty=(
+            self.attendance_record.attendance_session.timetable.faculty_subject.faculty
+            )
+        if self.faculty != attendance_faculty:
+            raise ValidationError("Faculty can only request corrections for their own attendance records.")
+
+        if self.attendance_record.is_present == self.requested_is_present:
+            raise ValidationError("Requested Status must be different from Current attendance status.")
+        
+        existing_request = (
+    AttendanceCorrectionRequest.objects.filter(
+        attendance_record=self.attendance_record,
+        status="PENDING"
+    ).exclude(pk=self.pk))
+
+        if existing_request.exists():
+            raise ValidationError(
+        "A pending correction request already exists."
+    )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return (
+        f"{self.attendance_record.student} - "
+        f"{self.status}"
+    )
+
+
+class Notice(models.Model):
+    NOTICE_TYPE_CHOICES=(
+        ("GENERAL","General"),
+        ("DEPARTMENT","Department"),
+        ("CLASS","Class")
+    )   
+    title=models.CharField(max_length=200)
+    content=models.TextField(blank=True)
+    created_by=models.ForeignKey("users.Profile",on_delete=models.PROTECT)
+    notice_type=models.CharField(max_length=20,choices=NOTICE_TYPE_CHOICES)
+    department=models.ForeignKey(Department, on_delete=models.PROTECT, blank=True,null=True)
+    academic_class=models.ForeignKey(AcademicClass,on_delete=models.PROTECT, blank=True,null=True)
+    attachment=models.FileField(upload_to="notices/", blank=True, null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
     
+    def clean(self):
+        if self.notice_type=="GENERAL":
+            self.department=None  
+            self.academic_class=None
+        
+        elif self.notice_type=="DEPARTMENT":
+            if self.department is None:
+                raise ValidationError("Department notice must have a department.")
+            
+            self.academic_class=None
+        
+        elif self.notice_type=="CLASS":
+            if self.academic_class is None:
+                raise ValidationError("Class notice must have an academic class.")
+            
+            self.department=None
+
+        if self.created_by.role not in ["ADMIN","FACULTY"]:
+            raise ValidationError("Only Admin or Faculty can create notices.")
+
+        if not self.content and not self.attachment:
+            raise ValidationError("Notice must contain content or an attachment.")
+
+        if self.created_by.role == "FACULTY":
+            faculty_department= self.created_by.department
+            if self.notice_type=="DEPARTMENT":
+                if self.department!=faculty_department:
+                    raise ValidationError("Faculty can only create department notices for their own department.")
+                
+            elif self.notice_type=="CLASS":
+                if (self.academic_class.department != faculty_department):
+                    raise ValidationError("Faculty can only create class notices for classes in their own department.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)       
+
+    def __str__(self):
+        return self.title
+           
