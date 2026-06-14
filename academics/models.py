@@ -290,4 +290,75 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+class Event(models.Model):
+    EVENT_TYPE_CHOICES=(
+        ("GENERAL","General"),
+        ("DEPARTMENT","Department"),
+        ("CLASS","Class")
+    )   
+    title=models.CharField(max_length=200)
+    description=models.TextField(blank=True)
+    event_type=models.CharField(max_length=20,choices=EVENT_TYPE_CHOICES)
+    department=models.ForeignKey(Department, on_delete=models.PROTECT, null=True,blank=True)
+    academic_class=models.ForeignKey(AcademicClass, on_delete=models.PROTECT,null=True,blank=True)
+    event_date=models.DateField()
+    start_time=models.TimeField()
+    end_time=models.TimeField()
+    venue=models.CharField(max_length=100)
+    poster=models.FileField(upload_to="events/", blank=True, null=True)
+    google_form_link=models.URLField(blank=True)
+    created_by=models.ForeignKey("users.Profile",on_delete=models.PROTECT,related_name="created_events")
+    faculty_incharge = models.ForeignKey(
+        "users.Profile",
+        on_delete=models.PROTECT,
+        related_name="managed_events"
+    )
+    is_active = models.BooleanField(
+        default=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    def clean(self):
+        if self.event_type=="GENERAL":
+            self.department=None  
+            self.academic_class=None
+        elif self.event_type=="DEPARTMENT":
+            if self.department is None:
+                raise ValidationError("Department event must have a department.")
+            self.academic_class=None
+        elif self.event_type=="CLASS":
+            if self.academic_class is None:
+                raise ValidationError("Class event must have a class.")
+            self.department=None
+        
+        if self.created_by.role not in ["ADMIN","FACULTY"]:
+            raise ValidationError("Only admin and faculty can create the event.")
+
+        if self.created_by.role == "FACULTY":
+            faculty_department= self.created_by.department
+            if self.event_type=="DEPARTMENT":
+                if self.department!=faculty_department:
+                    raise ValidationError("Faculty can only create department events for their own department.")
+                
+            elif self.event_type=="CLASS":
+                if (self.academic_class.department != faculty_department):
+                    raise ValidationError("Faculty can only create class events for classes in their own department.")
+        
+        if self.faculty_incharge.role != "FACULTY":
+            raise ValidationError("Faculty Incharge must have FACULTY role.")
+
+        if self.start_time>=self.end_time:
+            raise ValidationError("End time must be after start time.")
+        
+        if self.event_date<=date.today():
+            raise ValidationError("Event date must be in the future.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)       
+
+    def __str__(self):
+        return self.title
            
