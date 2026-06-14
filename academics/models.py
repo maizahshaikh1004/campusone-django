@@ -362,3 +362,45 @@ class Event(models.Model):
     def __str__(self):
         return self.title
            
+class EventCoordinator(models.Model):
+    event=models.ForeignKey(Event, on_delete=models.CASCADE)
+    student=models.ForeignKey("users.Profile", on_delete=models.PROTECT)
+
+    def clean(self):
+        if self.student.role != "STUDENT":
+            raise ValidationError("Only students can be event coordinators.")
+        
+        existing_coordinators =(
+            EventCoordinator.objects.filter(event=self.event).exclude(pk=self.pk)
+            ) 
+        if existing_coordinators.count() >= 2:
+            raise ValidationError("Maximum 2 coordinators are allowed per event.")
+        # GENERAL events: any student can be coordinator
+        if self.event.event_type == "DEPARTMENT":
+            if self.student.academic_class.department != self.event.department:
+                raise ValidationError("Coordinator must belong to the event department.")
+        
+        if self.event.event_type == "CLASS":
+            event_department = (self.event.academic_class.department)
+            if (self.student.academic_class.department!= event_department ):
+                raise ValidationError(
+            "Coordinator must belong to the event department."
+        )
+    class Meta:
+        unique_together = (
+        "event",
+        "student"
+    )
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"{self.student} - {self.event}"
+    
+
+
+    
+
+    
+
+        
