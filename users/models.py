@@ -12,6 +12,7 @@ class Profile(models.Model):
     )
 
     user=models.OneToOneField(User,on_delete=models.CASCADE)
+    full_name=models.CharField(max_length=100,default="")
     role=models.CharField(max_length=20,choices=ROLE_CHOICES)
     department = models.ForeignKey(
     Department,
@@ -78,12 +79,16 @@ class RegistrationRequest(models.Model):
             raise ValidationError(
                 "A pending registration request already exists for this email."
             )
-        if User.objects.filter(email=self.email).exists():
-            raise ValidationError(
-                "An account with this email already exists."
-            )
+        if self.pk is None:
+            if User.objects.filter(email=self.email).exists():
+                raise ValidationError(
+                    "An account with this email already exists."
+                )
         
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.name
 
