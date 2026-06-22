@@ -1,2 +1,126 @@
 <h1>Student Dashboard</h1>
-<p>Hello {{ request.user.username }}</p>
+<p>Hello {{ name }}</p>
+
+<div class="activity-card">
+    <div class="activity-header">
+        <h2 class="activity-title">Recent Notices</h2>
+    </div>
+
+    {% for notice in recent_notices %}
+        <div class="activity-item">
+            <div class="activity-item-title">
+                {{ notice.title }}
+            </div>
+
+            <div class="activity-item-meta">
+                {{ notice.created_at|date:"d M Y" }}
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-text">
+                No notices available.
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Upcoming Events -->
+<div class="activity-card">
+    <div class="activity-header">
+        <h2 class="activity-title">Upcoming Events</h2>
+        <div class="activity-item">
+            View All →
+        </div>
+    </div>
+
+    {% for event in upcoming_events %}
+    <div class="activity-item">
+
+        <div class="activity-item-content">
+
+            <div class="activity-info">
+
+                <div class="activity-item-title">
+                    {{ event.title }}
+                </div>
+
+                <div class="activity-item-meta">
+                    <span>📅</span>
+
+                    <span>
+                        {{ event.event_date|date:"d M Y" }}
+                    </span>
+
+                    <span>⏰</span>
+
+                    <span>
+                        {{ event.start_time }}
+                    </span>
+                </div>
+
+            </div>
+
+            <span class="activity-badge badge-event">
+                Event
+            </span>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            📅
+        </div>
+
+        <div class="empty-text">
+            No upcoming events
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    <div class="stat-value">
+        Total Subjects: 
+        {{ total_subjects }}
+    </div>
+
+    <!-- Pending Assignments -->
+    <div class="stat-card assignments"> 
+        <div class="stat-header">
+            <div class="stat-icon pink">📝</div>
+        </div>
+        <div class="stat-label">Pending</div>
+        <div class="stat-value">{{ pending_assignments_count }}</div>
+        <div class="stat-subtitle">Assignments due</div>
+    </div>
+
+    <!-- Event Coordinator -->
+    <div class="stat-card coordinator" >
+        <div class="stat-header">
+            <div class="stat-icon green">🎯</div>
+        </div>
+        <div class="stat-label">Coordinator</div>
+        <div class="stat-value">{{ coordinator_events_count }}</div>
+        <div class="stat-subtitle">Events managing</div>
+    </div>
+
+    <!-- Attendance -->
+    <div class="stat-card attendance" >
+        <div class="stat-label">Overall Attendance</div>
+        <div class="attendance-ring-wrapper">
+            <div class="attendance-ring">
+                <span class="attendance-percentage">{{ attendance_percentage }}%</span>
+            </div>
+            <div>
+                <div class="stat-subtitle">Keep it up!</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>

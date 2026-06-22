@@ -44,7 +44,7 @@ class AssignmentSubmission(models.Model):
             return False
             
         return(
-            self.submitted_at.date() > self.assignment.due_date
+            self.submitted_at > self.assignment.due_date
         )
 
     def save(self, *args, **kwargs):
