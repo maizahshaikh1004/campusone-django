@@ -1,0 +1,104 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="
+            {% if request.session.role == 'ADMIN' %}
+                {% url 'admin_dashboard' %}
+            {% elif request.session.role == 'FACULTY' %}
+                {% url 'faculty_dashboard' %}
+            {% else %}
+                {% url 'student_dashboard' %}
+            {% endif %}
+            " class="back-link">
+                <span>←</span>
+                <span>Back to Dashboard</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main -->
+    <main class="container">
+    
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <span>📅</span>
+                <span>Events</span>
+            </h1>
+            {% if events %}
+            <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
+            {% endif %}
+        </div>
+    
+        <!-- Events Grid -->
+        {% if events %}
+        <div class="events-grid">
+            {% for e in events %}
+            <div class="event-card">
+                
+                <!-- Event Image -->
+                <div class="event-image">
+                    {% if e.poster %}
+                        <img src="{{ e.poster.url }}" alt="{{ e.title }}">
+                    {% else %}
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:white;font-size:3rem;">
+                            🎉
+                        </div>
+                    {% endif %}
+                    <!-- Dynamic badge will be set by JavaScript -->
+                    <div class="event-badge" data-date="{{ e.event_date|date:'Y-m-d' }}" data-start="{{ e.start_time|time:'H:i:s' }}" data-end="{{ e.end_time|time:'H:i:s' }}">
+                        <span class="badge-icon">📅</span>
+                        <span class="badge-text">Upcoming</span>
+                    </div>
+                </div>
+    
+                <!-- Event Content -->
+                <div class="event-content">
+                    <h2 class="event-title">{{ e.title }}</h2>
+                    <p class="event-description">{{ e.description }}</p>
+    
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>{{ e.event_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⏰</span>
+                            <span>{{ e.start_time }} – {{ e.end_time }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📍</span>
+                            <span>{{ e.venue }}</span>
+                        </div>
+                    </div>
+    
+                    <div class="event-footer">
+                        <div class="event-organizer">
+                            <div class="organizer-avatar">{{ e.faculty_incharge.full_name|slice:":1"|upper }}</div>
+                            <span>{{ e.faculty_incharge.full_name }}</span>
+                        </div>
+                        <a href="{% url 'event_detail' e.id %}" class="view-link">
+                            Details →
+                        </a>
+                    </div>
+                </div>
+    
+            </div>
+            {% endfor %}
+        </div>
+    
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <div class="empty-title">No Events Available</div>
+            <div class="empty-text">Check back later for upcoming campus events</div>
+        </div>
+        {% endif %}
+    
+    </main>

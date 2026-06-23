@@ -6,4 +6,5 @@ urlpatterns = [
     path('student/dashboard/',views.student_dashboard,name="student_dashboard"),
     path("",include("users.urls")),
 
+
 ]

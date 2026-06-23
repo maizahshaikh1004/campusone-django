@@ -4,6 +4,7 @@
 <div class="activity-card">
     <div class="activity-header">
         <h2 class="activity-title">Recent Notices</h2>
+        <a href="{% url 'student_notices' %}"> View All</a>
     </div>
 
     {% for notice in recent_notices %}
@@ -28,9 +29,7 @@
 <div class="activity-card">
     <div class="activity-header">
         <h2 class="activity-title">Upcoming Events</h2>
-        <div class="activity-item">
-            View All →
-        </div>
+        <a href="{% url 'student_events' %}"> View All</a>
     </div>
 
     {% for event in upcoming_events %}
@@ -120,6 +119,16 @@
                 <div class="stat-subtitle">Keep it up!</div>
             </div>
         </div>
+    </div>
+
+    <!--Timetable-->
+    <div class="stat-card timetable" >
+        <div class="stat-header">
+            <div class="stat-icon indigo">🗓️</div>
+        </div>
+        <div class="stat-label">Timetable</div>
+        <div class="stat-value">{{ today_lectures_count }}</div>
+        <div class="stat-subtitle">Todays's Lectures</div>
     </div>
 
 </div>

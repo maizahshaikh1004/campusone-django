@@ -3,11 +3,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from academics.models import Subject,Notice, Event, EventCoordinator, AttendanceRecord
+from academics.models import Subject,Notice, Event, EventCoordinator, AttendanceRecord, Timetable
 from users.models import Profile
 from django.utils import timezone
 from assignments.models import Assignment, AssignmentSubmission
-
+from datetime import datetime
 def home(request):
     return render(request,'home.html')
 
@@ -35,6 +35,7 @@ def student_dashboard(request):
     )
     .order_by("-created_at")[:5]
     )
+    
 
     notice_count = (
     Notice.objects.filter(
@@ -136,6 +137,18 @@ def student_dashboard(request):
     else:
         attendance_percentage = 0
 
+    coordinator_events_count = EventCoordinator.objects.filter(
+    student=profile
+).count()
+
+    ##timetable
+    today=datetime.now().strftime("%A").upper()
+    today_lectures=Timetable.objects.filter(
+        faculty_subject__subject__academic_class=student_class,day=today
+    )
+    today_lectures_count=today_lectures.count()
+
+
     context = {
     "name": profile.full_name,
     "recent_notices": recent_notices,
@@ -147,6 +160,7 @@ def student_dashboard(request):
     "pending_assignments_count": pending_assignments_count,
     "coordinator_events_count":coordinator_events_count,
     "attendance_percentage": attendance_percentage,
+    "today_lectures_count":today_lectures_count,
     }
 
 
