@@ -1,0 +1,59 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'student_dashboard' %}" class="back-link">
+                <span>←</span>
+                <span>Back to Dashboard</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main -->
+    <main class="container">
+    
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <span>📚</span>
+                <span>My Subjects</span>
+            </h1>
+            <p>All subjects you're enrolled in this semester</p>
+        </div>
+    
+        {% if subjects %}
+        <!-- Count Badge -->
+        <div class="count-badge">
+            {{ subjects|length }} Subject{{ subjects|length|pluralize }}
+        </div>
+    
+        <!-- Subjects Grid -->
+        <div class="subjects-grid">
+            {% for s in subjects %}
+            <div class="subject-card">
+                <div class="subject-icon">📖</div>
+                
+                <div class="subject-header">
+                    <div class="subject-info">
+                        <div class="subject-name">{{ s.name }}</div>
+                        
+                    </div>
+                    <span class="subject-badge">Active</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <div class="empty-text">No subjects enrolled yet</div>
+        </div>
+        {% endif %}
+    
+    </main>

@@ -26,7 +26,7 @@
     {% endfor %}
 
     <!-- Upcoming Events -->
-<div class="activity-card">
+    <div class="activity-card">
     <div class="activity-header">
         <h2 class="activity-title">Upcoming Events</h2>
         <a href="{% url 'student_events' %}"> View All</a>
@@ -86,6 +86,8 @@
     <div class="stat-value">
         Total Subjects: 
         {{ total_subjects }}
+
+        <a href="{%url 'student_subjects'%}">View All</a>
     </div>
 
     <!-- Pending Assignments -->
@@ -111,6 +113,7 @@
     <!-- Attendance -->
     <div class="stat-card attendance" >
         <div class="stat-label">Overall Attendance</div>
+        <a href="{% url 'student_attendance'%}">View</a>
         <div class="attendance-ring-wrapper">
             <div class="attendance-ring">
                 <span class="attendance-percentage">{{ attendance_percentage }}%</span>
@@ -127,6 +130,7 @@
             <div class="stat-icon indigo">🗓️</div>
         </div>
         <div class="stat-label">Timetable</div>
+        <a href="{% url 'student_timetable'%}">View all</a>
         <div class="stat-value">{{ today_lectures_count }}</div>
         <div class="stat-subtitle">Todays's Lectures</div>
     </div>

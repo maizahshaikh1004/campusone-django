@@ -7,7 +7,7 @@ from django.db.models import Q
 from users.models import Profile
 from django.utils import timezone
 from datetime import datetime
-from academics.models import Notice, Event, EventCoordinator
+from academics.models import Notice, Event, EventCoordinator, Subject, AttendanceRecord
 # Create your views here.
 
 @login_required
@@ -122,5 +122,208 @@ def event_detail(request, event_id):
         "student/event_detail.html",
         {
             "event": event
+        }
+    )
+
+
+@login_required
+def student_attendance(request):
+
+    profile = request.user.profile
+
+    if profile.role != "STUDENT":
+        return render(
+            request,
+            "403.html",
+            {"message": "Students Only."},
+            status=403
+        )
+
+    student_class = profile.academic_class
+
+    subjects = Subject.objects.filter(
+        academic_class=student_class
+    )
+
+    attendance_data = []
+
+    for subject in subjects:
+
+        records = AttendanceRecord.objects.filter(
+            student=profile,
+            attendance_session__timetable__faculty_subject__subject=subject
+        )
+
+        total = records.count()
+
+        present = records.filter(
+            is_present=True
+        ).count()
+
+        percentage = (
+            round((present / total) * 100, 1)
+            if total > 0 else 0
+        )
+
+        attendance_data.append({
+            "subject_id": subject.id,
+            "subject_name": subject.name,
+            "total": total,
+            "present": present,
+            "percentage": percentage,
+        })
+
+    return render(
+        request,
+        "student/student_attendance.html",
+        {
+            "attendance_data": attendance_data
+        }
+    )
+
+@login_required
+def student_attendance_detail(
+    request,
+    subject_id
+):
+
+    profile = request.user.profile
+
+    subject = Subject.objects.get(
+        pk=subject_id
+    )
+
+    records = AttendanceRecord.objects.filter(
+        student=profile,
+        attendance_session__timetable__faculty_subject__subject=subject
+    ).select_related(
+        "attendance_session",
+        "attendance_session__timetable"
+    ).order_by(
+        "-attendance_session__lecture_date"
+    )
+
+    total = records.count()
+
+    present = records.filter(
+        is_present=True
+    ).count()
+
+    absent = total - present
+
+    percentage = (
+        round((present / total) * 100, 1)
+        if total > 0 else 0
+    )
+
+    attendance_records = []
+
+    for record in records:
+
+        timetable = (
+            record
+            .attendance_session
+            .timetable
+        )
+
+        attendance_records.append({
+            "date":
+                record.attendance_session.lecture_date,
+
+            "present":
+                record.is_present,
+
+            "day":
+                timetable.day,
+
+            "start":
+                timetable.start_time,
+
+            "end":
+                timetable.end_time,
+        })
+
+    context = {
+        "subject_name": subject.name,
+        "total": total,
+        "present": present,
+        "absent": absent,
+        "percentage": percentage,
+        "attendance_records": attendance_records,
+    }
+
+    return render(
+        request,
+        "student/student_attendance_detail.html",
+        context
+    )
+
+@login_required
+def student_subjects(request):
+
+    profile = request.user.profile
+
+    if profile.role != "STUDENT":
+        return render(
+            request,
+            "403.html",
+            {"message": "Students Only."},
+            status=403
+        )
+
+    subjects = Subject.objects.filter(
+        academic_class=profile.academic_class
+    )
+
+    return render(
+        request,
+        "student/student_subjects.html",
+        {
+            "subjects": subjects
+        }
+    )
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+from academics.models import Timetable
+
+
+@login_required
+def student_timetable(request):
+
+    profile = request.user.profile
+
+    if profile.role != "STUDENT":
+        return render(
+            request,
+            "403.html",
+            {
+                "message": "Students Only."
+            },
+            status=403
+        )
+
+    timetable_entries = (
+        Timetable.objects.filter(
+            faculty_subject__subject__academic_class=
+            profile.academic_class
+        )
+        .select_related(
+            "faculty_subject",
+            "faculty_subject__subject",
+            "faculty_subject__faculty"
+        )
+        .order_by(
+            "day",
+            "start_time"
+        )
+    )
+
+    return render(
+        request,
+        "student/student_timetable.html",
+        {
+            "timetable_entries": timetable_entries
         }
     )

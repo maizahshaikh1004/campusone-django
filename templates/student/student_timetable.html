@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>📅 My Timetable</h1>
+
+{% for lecture in timetable_entries %}
+
+<div class="subject-card">
+
+    <h3>
+        {{ lecture.faculty_subject.subject.name }}
+    </h3>
+
+    <p>
+        <strong>Day:</strong>
+        {{ lecture.day }}
+    </p>
+
+    <p>
+        <strong>Time:</strong>
+        {{ lecture.start_time }}
+        -
+        {{ lecture.end_time }}
+    </p>
+
+    <p>
+        <strong>Faculty:</strong>
+        {{ lecture.faculty_subject.faculty.full_name }}
+    </p>
+
+</div>
+
+{% empty %}
+
+<p>No timetable available.</p>
+
+{% endfor %}
+
+{% endblock %}

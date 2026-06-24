@@ -1,0 +1,82 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'student_attendance' %}" class="back-link">
+                <span>←</span>
+                <span>Back to All Subjects</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main -->
+    <main class="container">
+    
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>{{ subject_name }}</h1>
+            <p>Detailed attendance records for this subject</p>
+        </div>
+    
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Attendance</div>
+                <div class="stat-value percentage">{{ percentage }}%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Lectures</div>
+                <div class="stat-value">{{ total }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Present</div>
+                <div class="stat-value" style="color: #22c55e;">{{ present }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Absent</div>
+                <div class="stat-value" style="color: #ef4444;">{{ absent }}</div>
+            </div>
+        </div>
+    
+        <!-- Records Card -->
+        <div class="records-card">
+            <div class="records-header">
+                <h2 class="records-title">Attendance Records</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="present">Present</button>
+                    <button class="filter-tab" data-filter="absent">Absent</button>
+                </div>
+            </div>
+    
+            <div class="records-list">
+                {% for record in attendance_records %}
+                <div class="record-item" data-status="{% if record.present %}present{% else %}absent{% endif %}">
+                    <div class="record-info">
+                        <div class="record-date">{{ record.date }}</div>
+                        <div class="record-meta">
+                            <span>{{ record.day }}</span>
+                            <span class="record-divider"></span>
+                            <span>{{ record.start }} - {{ record.end }}</span>
+                        </div>
+                    </div>
+                    {% if record.present %}
+                        <span class="status-badge badge-present">✓ Present</span>
+                    {% else %}
+                        <span class="status-badge badge-absent">✕ Absent</span>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <div>No attendance records found for this subject</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    
+    </main>
