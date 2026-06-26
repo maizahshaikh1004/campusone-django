@@ -29,6 +29,7 @@ class Profile(models.Model):
         blank=True,
         null=True
     )
+    address=models.TextField(blank=True)
     def __str__(self):
         return self.user.username
     

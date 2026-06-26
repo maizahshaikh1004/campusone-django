@@ -8,6 +8,7 @@ from users.models import Profile
 from django.utils import timezone
 from datetime import datetime
 from academics.models import Notice, Event, EventCoordinator, Subject, AttendanceRecord
+
 # Create your views here.
 
 @login_required
@@ -325,5 +326,72 @@ def student_timetable(request):
         "student/student_timetable.html",
         {
             "timetable_entries": timetable_entries
+        }
+    )
+
+
+@login_required
+def student_coordinator_events(request):
+
+    profile = request.user.profile
+
+    if profile.role != "STUDENT":
+        return render(
+            request,
+            "403.html",
+            {"message": "Students Only."},
+            status=403
+        )
+
+    today = timezone.localdate()
+
+    events = (
+        EventCoordinator.objects.filter(
+            student=profile,
+            event__is_active=True,
+            event__event_date__gte=today
+        )
+        .select_related("event")
+        .order_by("event__event_date")
+    )
+
+    return render(
+        request,
+        "student/student_coordinator_events.html",
+        {
+            "events": events
+        }
+    )
+
+@login_required
+def student_past_coordinator_events(request):
+
+    profile = request.user.profile
+
+    if profile.role != "STUDENT":
+        return render(
+            request,
+            "403.html",
+            {"message": "Students Only."},
+            status=403
+        )
+
+    today = timezone.localdate()
+
+    past_events = (
+        EventCoordinator.objects.filter(
+            student=profile,
+            event__is_active=True,
+            event__event_date__lt=today
+        )
+        .select_related("event")
+        .order_by("-event__event_date")
+    )
+
+    return render(
+        request,
+        "student/student_past_coordinator_events.html",
+        {
+            "past_events": past_events
         }
     )

@@ -1,3 +1,5 @@
+<a href="{%url 'profile' %}">View Profile</a>
+
 <h1>Student Dashboard</h1>
 <p>Hello {{ name }}</p>
 
@@ -98,6 +100,8 @@
         <div class="stat-label">Pending</div>
         <div class="stat-value">{{ pending_assignments_count }}</div>
         <div class="stat-subtitle">Assignments due</div>
+        <a href="{%url 'student_assignments'%}">View All</a>
+
     </div>
 
     <!-- Event Coordinator -->
@@ -108,6 +112,7 @@
         <div class="stat-label">Coordinator</div>
         <div class="stat-value">{{ coordinator_events_count }}</div>
         <div class="stat-subtitle">Events managing</div>
+        <a href="{% url 'student_coordinator_events' %}">View</a>
     </div>
 
     <!-- Attendance -->

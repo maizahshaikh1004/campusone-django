@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import RegistrationRequestForm, LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def register_request(request):
     if request.method=="POST":
@@ -81,4 +83,87 @@ def login_view(request):
         {"form":form}
     )
 
+@login_required
+def profile(request):
 
+    profile = request.user.profile
+
+    return render(
+        request,
+        "users/profile.html",
+        {
+            "profile": profile
+        }
+    )
+
+@login_required
+def view_profile(request, profile_id):
+
+    if request.user.profile.role != "ADMIN":
+        return render(
+            request,
+            "403.html",
+            {"message": "Admins Only"},
+            status=403
+        )
+
+    profile = get_object_or_404(
+        Profile.objects.select_related(
+            "user",
+            "department",
+            "academic_class"
+        ),
+        pk=profile_id
+    )
+
+    return render(
+        request,
+        "users/view_profile.html",
+        {
+            "profile": profile
+        }
+    )
+
+
+@login_required
+def edit_profile(request):
+
+    profile = request.user.profile
+
+    if request.method == "POST":
+
+        phone = request.POST.get("phone", "").strip()
+        address = request.POST.get("address", "").strip()
+        bio = request.POST.get("bio", "").strip()
+
+        if phone:
+            if (not phone.isdigit()) or len(phone) != 10:
+                messages.error(
+                    request,
+                    "Phone number must contain exactly 10 digits."
+                )
+                return redirect("edit_profile")
+
+        profile.phone = phone
+        profile.address = address
+        profile.bio = bio
+
+        if "profile_photo" in request.FILES:
+            profile.profile_photo = request.FILES["profile_photo"]
+
+        profile.save()
+
+        messages.success(
+            request,
+            "Profile updated successfully."
+        )
+
+        return redirect("profile")
+
+    return render(
+        request,
+        "users/edit_profile.html",
+        {
+            "profile": profile
+        }
+    )

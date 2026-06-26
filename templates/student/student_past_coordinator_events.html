@@ -1,0 +1,82 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'student_coordinator_events' %}" class="back-link">
+                <span>←</span>
+                <span>Back to Current Events</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main -->
+    <main class="container">
+    
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <span>📜</span>
+                <span>Past Coordinated Events</span>
+            </h1>
+            {% if past_events %}
+            <div class="count-badge">{{ past_events|length }} Completed</div>
+            {% endif %}
+        </div>
+    
+        <!-- Events Grid -->
+        {% if past_events %}
+        <div class="events-grid">
+            {% for e in past_events %}
+            <div class="event-card">
+                
+                <!-- Poster -->
+                <div class="event-poster">
+                    {% if e.past_events.poster %}
+                        <img src="/media/{{ e.past_events.poster.url }}" alt="{{ e.past_events.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/200x250/6366f1/ffffff?text=Event+Poster" alt="Event Poster">
+                    {% endif %}
+                    <div class="completed-badge">
+                        <span>✓</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+    
+                <!-- Content -->
+                <div class="event-content">
+                    <h2 class="event-title">{{ e.past_events.title }}</h2>
+    
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-icon">📅</div>
+                            <span>{{ e.past_events.event_date }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">⏰</div>
+                            <span>{{ e.past_events.start_time }} – {{ e.past_events.end_time }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">📍</div>
+                            <span>{{ e.past_events.venue }}</span>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+            {% endfor %}
+        </div>
+    
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">📜</div>
+            <div class="empty-title">No Past Events</div>
+            <div class="empty-text">You have no past coordinated events</div>
+        </div>
+        {% endif %}
+    
+    </main>

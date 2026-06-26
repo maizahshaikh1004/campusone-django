@@ -1,0 +1,104 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'student_dashboard' %}" class="back-link">
+                <span>←</span>
+                <span>Back to Dashboard</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main -->
+    <main class="container">
+    
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <span>🎯</span>
+                <span>My Coordinated Events</span>
+            </h1>
+            {% if events %}
+            <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
+            {% endif %}
+        </div>
+    
+        <!-- Events Grid -->
+        {% if events %}
+        <div class="events-grid">
+            {% for e in events %}
+            <div class="event-card">
+                
+                <!-- Poster -->
+                <div class="event-poster">
+                    {% if e.event.poster %}
+                        <img src="/media/{{ e.event.poster.url }}" alt="{{ e.event.event_title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/200x250/2563eb/ffffff?text=Event+Poster" alt="Event Poster">
+                    {% endif %}
+                    <div class="coordinator-badge">
+                        <span>⭐</span>
+                        <span>Coordinator</span>
+                    </div>
+                </div>
+    
+                <!-- Content -->
+                <div class="event-content">
+                    <h2 class="event-title">{{ e.event.event_title }}</h2>
+    
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-icon">📅</div>
+                            <span>{{ e.event.event_date }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">⏰</div>
+                            <span>{{ e.event.start_time }} – {{ e.event.end_time }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">📍</div>
+                            <span>{{ e.event.venue }}</span>
+                        </div>
+                    </div>
+    
+                    <div class="event-actions">
+                        <a href="{% url 'event_detail' e.event.id %}" class="btn btn-view">
+                            <span>👁️</span>
+                            <span>View Details</span>
+                        </a>
+                        {% if e.event.google_form_link %}
+                        <a href="{{ e.event.google_form_link }}" target="_blank" class="btn btn-register">
+                            <span>🔗</span>
+                            <span>Registration Link</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+    
+            </div>
+            {% endfor %}
+        </div>
+    
+        
+    
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <div class="empty-title">No Coordinated Events</div>
+            <div class="empty-text">You are not assigned as coordinator for any active events</div>
+        </div>
+        {% endif %}
+    
+        <!-- Past Events Link -->
+        <div class="past-events-link">
+            <a href="{% url 'student_past_coordinator_events' %}" class="past-link">
+                View Past Coordinated Events →
+            </a>
+        </div>
+    
+    </main>

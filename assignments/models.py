@@ -13,7 +13,7 @@ class Assignment(models.Model):
         ordering=["-created_at"]
 
     def clean(self):
-        if self.due_date < date.today():
+        if self.pk is None and self.due_date < date.today():
             raise ValidationError("Due date cannot be in the past.")
 
     def __str__(self):

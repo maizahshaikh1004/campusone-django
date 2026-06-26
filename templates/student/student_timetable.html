@@ -1,40 +1,89 @@
-{% extends "base.html" %}
+<body>
 
-{% block content %}
-
-<h1>📅 My Timetable</h1>
-
-{% for lecture in timetable_entries %}
-
-<div class="subject-card">
-
-    <h3>
-        {{ lecture.faculty_subject.subject.name }}
-    </h3>
-
-    <p>
-        <strong>Day:</strong>
-        {{ lecture.day }}
-    </p>
-
-    <p>
-        <strong>Time:</strong>
-        {{ lecture.start_time }}
-        -
-        {{ lecture.end_time }}
-    </p>
-
-    <p>
-        <strong>Faculty:</strong>
-        {{ lecture.faculty_subject.faculty.full_name }}
-    </p>
-
-</div>
-
-{% empty %}
-
-<p>No timetable available.</p>
-
-{% endfor %}
-
-{% endblock %}
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'student_dashboard' %}" class="back-link">
+                <span>←</span>
+                <span>Back to Dashboard</span>
+            </a>
+    
+            <button class="theme-toggle" id="themeToggle">
+                🌙
+            </button>
+        </div>
+    </nav>
+    
+    <main class="container">
+    
+        <div class="page-header">
+            <h1>📅 My Timetable</h1>
+            <p>Weekly Class Schedule</p>
+        </div>
+    
+        {% if timetable_entries %}
+    
+        <div class="timetable-list">
+    
+            {% for lecture in timetable_entries %}
+    
+            <div class="subject-card">
+    
+                <div class="subject-header">
+    
+                    <div>
+    
+                        <h2>
+                            {{ lecture.faculty_subject.subject.name }}
+                        </h2>
+    
+                        <p>
+                            {{ lecture.day }}
+                        </p>
+    
+                    </div>
+    
+                    <span class="badge">
+    
+                        {{ lecture.start_time }}
+                        -
+                        {{ lecture.end_time }}
+    
+                    </span>
+    
+                </div>
+    
+                <div class="subject-footer">
+    
+                    👨‍🏫
+                    {{ lecture.faculty_subject.faculty.full_name }}
+    
+                </div>
+    
+            </div>
+    
+            {% endfor %}
+    
+        </div>
+    
+        {% else %}
+    
+        <div class="empty-state">
+    
+            <div class="empty-icon">
+                📅
+            </div>
+    
+            <div class="empty-text">
+    
+                No timetable has been published yet.
+    
+            </div>
+    
+        </div>
+    
+        {% endif %}
+    
+    </main>
+    
+    </body>

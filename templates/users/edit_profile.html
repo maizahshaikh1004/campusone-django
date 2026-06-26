@@ -1,0 +1,65 @@
+
+<body>
+
+    <div class="container">
+    
+        <div class="header">
+            <h2>✏ Edit Profile</h2>
+            <a href="{% url 'profile' %}" class="back">← Back</a>
+        </div>
+    
+        <div class="card">
+    
+            <!-- 🔔 Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="{{ message.tags }}"><b>{{ message }}</b></p>
+                {% endfor %}
+            {% endif %}
+    
+            <!-- 📸 PROFILE PHOTO -->
+            <div class="photo-wrap">
+                {% if profile and profile.profile_photo %}
+                    <img src="/media/{{ profile.profile_photo.url }}" class="avatar">
+                {% else %}
+                    <img src="https://via.placeholder.com/130?text=No+Photo" class="avatar">
+                {% endif %}
+            </div>
+    
+            <!-- FORM -->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+    
+                <label>Profile Photo</label>
+                <input type="file" name="profile_photo" accept="image/*">
+    
+                <label>Phone Number</label>
+                <input type="tel"
+                       name="phone"
+                       value="{{ profile.phone}}"
+                       pattern="[0-9]{10}"
+                       maxlength="10"
+                       minlength="10"
+                       inputmode="numeric"
+                       placeholder="Enter 10 digit phone number"
+                       required>
+    
+                <label>Address</label>
+                <textarea name="address" rows="3">{{ profile.address|default:'' }}</textarea>
+    
+                <label>Bio</label>
+                <textarea name="bio" rows="4">{{ profile.bio|default:'' }}</textarea>
+    
+                <div class="actions">
+                    <button type="submit" class="save">💾 Save Profile</button>
+                    <a href="{% url 'profile' %}" class="cancel">Cancel</a>
+                </div>
+            </form>
+    
+        </div>
+    
+    </div>
+    
+    </body>
+    </html>
+    
