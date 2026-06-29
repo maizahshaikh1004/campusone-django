@@ -1,0 +1,102 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+    
+            <a href="{% url 'faculty_dashboard' %}" class="back-link">
+                ← Back to Dashboard
+            </a>
+    
+        </div>
+    </nav>
+    
+    
+    <main class="container">
+    
+        <div class="page-header">
+    
+            <h1>
+                📚 My Subjects
+            </h1>
+    
+            {% if subjects %}
+                <div class="count-badge">
+                    {{ subjects|length }} Subject{{ subjects|length|pluralize }}
+                </div>
+            {% endif %}
+    
+        </div>
+    
+    
+        {% if subjects %}
+    
+        <div class="subjects-grid">
+    
+            {% for fs in subjects %}
+    
+            <div class="subject-card">
+    
+                <div class="subject-header">
+    
+                    <h2>
+                        {{ fs.subject.name }}
+                    </h2>
+    
+                </div>
+    
+                <div class="subject-body">
+    
+                    <p>
+                        <strong>Department:</strong>
+                        {{ fs.subject.academic_class.department.name }}
+                    </p>
+    
+                    <p>
+                        <strong>Class:</strong>
+                        {{ fs.subject.academic_class }}
+                    </p>
+    
+                </div>
+    
+                <div class="subject-footer">
+    
+                    <a href="#">
+                        📋 Attendance
+                    </a>
+    
+                    <a href="#">
+                        📝 Assignments
+                    </a>
+    
+                </div>
+    
+            </div>
+    
+            {% endfor %}
+    
+        </div>
+    
+        {% else %}
+    
+        <div class="empty-state">
+    
+            <div class="empty-icon">
+                📚
+            </div>
+    
+            <div class="empty-title">
+                No Subjects Assigned
+            </div>
+    
+            <div class="empty-text">
+                Your assigned subjects will appear here.
+            </div>
+    
+        </div>
+    
+        {% endif %}
+    
+    </main>
+    
+    </body>

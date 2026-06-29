@@ -1,0 +1,158 @@
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+    
+            <a href="{% url 'faculty_dashboard' %}" class="back-link">
+                ← Back to Dashboard
+            </a>
+    
+            <a href="{%url 'create_assignment'%}" class="create-btn">
+                ➕ Create Assignment
+            </a>
+    
+        </div>
+    </nav>
+
+    <main class="container">
+    
+        <div class="page-header">
+    
+            <h1>📝 My Assignments</h1>
+    
+            {% if assignments %}
+            <div class="count-badge">
+                {{ assignments|length }} Assignment{{ assignments|length|pluralize }}
+            </div>
+            {% endif %}
+    
+        </div>
+    
+    
+        {% if assignments %}
+    
+        <div class="assignments-grid">
+    
+            {% for assignment in assignments %}
+    
+            <div class="assignment-card">
+    
+                <div class="card-header">
+    
+                    <div>
+    
+                        <h2>
+                            {{ assignment.title }}
+                        </h2>
+    
+                        <p>
+    
+                            📚
+                            {{ assignment.faculty_subject.subject.name }}
+    
+                        </p>
+    
+                        <p>
+    
+                            🎓
+                            {{ assignment.faculty_subject.subject.academic_class }}
+    
+                        </p>
+    
+                    </div>
+    
+                    <span class="status-badge">
+    
+                        Due:
+                        {{ assignment.due_date }}
+    
+                    </span>
+    
+                </div>
+    
+                {% if assignment.description %}
+    
+                <p>
+    
+                    {{ assignment.description }}
+    
+                </p>
+    
+                {% endif %}
+    
+                <div class="assignment-actions">
+    
+                    {% if assignment.question_file %}
+    
+                    <a
+                        href="{{ assignment.question_file.url }}"
+                        target="_blank"
+                        class="btn">
+    
+                        📎 Question Paper
+    
+                    </a>
+    
+                    {% endif %}
+    
+                    <a
+                        href="#"
+                        class="btn">
+    
+                        📂 Submissions
+    
+                    </a>
+    
+                    <a
+                        href="{%url 'edit_assignment' assignment.id %}"
+                        class="btn">
+    
+                        ✏ Edit
+    
+                    </a>
+    
+                    <a
+                        href="{%url 'delete_assignment' assignment.id%}"
+                        class="btn btn-danger">
+    
+                        🗑 Delete
+    
+                    </a>
+    
+                </div>
+    
+            </div>
+    
+            {% endfor %}
+    
+        </div>
+    
+        {% else %}
+    
+        <div class="empty-state">
+    
+            <div class="empty-icon">
+    
+                📝
+    
+            </div>
+    
+            <div class="empty-title">
+    
+                No Assignments Yet
+    
+            </div>
+    
+            <div class="empty-text">
+    
+                Click "Create Assignment" to create your first assignment.
+    
+            </div>
+    
+        </div>
+    
+        {% endif %}
+    
+    </main>
+    
+    </body>

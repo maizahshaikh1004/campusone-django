@@ -1,0 +1,435 @@
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+    
+            <div class="logo">
+                <span class="logo-icon">👨‍🏫</span>
+                <span>CampusOne</span>
+            </div>
+    
+            <div class="nav-actions">
+    
+                <a href="{% url 'profile' %}" class="nav-link">
+                    Profile
+                </a>
+    
+                <a href="{% url 'logout' %}" class="nav-link">
+                    Logout
+                </a>
+    
+            </div>
+    
+        </div>
+    </nav>
+    
+    
+    <main class="container">
+    
+        <!-- Welcome Banner -->
+    
+        <div class="welcome-banner">
+    
+            <div class="welcome-content">
+    
+                <h1>
+                    👋 Welcome back, {{ name }}!
+                </h1>
+    
+                <p>
+                    Manage your classes, assignments and events.
+                </p>
+    
+            </div>
+    
+        </div>
+    
+    
+        <!-- Dashboard Cards -->
+    
+        <div class="stats-grid">
+    
+            <!-- Subjects -->
+    
+            <div class="stat-card subjects"
+                 onclick="location.href='{% url 'faculty_subjects' %}'">
+    
+                <div class="stat-header">
+                    <div class="stat-icon blue">📚</div>
+                </div>
+    
+                <div class="stat-label">
+                    Subjects
+                </div>
+    
+                <div class="stat-value">
+                    {{ total_subjects }}
+                </div>
+    
+                <div class="stat-subtitle">
+                    Teaching
+                </div>
+    
+            </div>
+    
+    
+            <!-- Assignments -->
+    
+            <div class="stat-card assignments"
+                 onclick="location.href='{% url 'faculty_assignments' %}'">
+    
+                <div class="stat-header">
+                    <div class="stat-icon pink">📝</div>
+                </div>
+    
+                <div class="stat-label">
+                    Assignments
+                </div>
+    
+                <div class="stat-value">
+                    {{ total_assignments }}
+                </div>
+    
+                <div class="stat-subtitle">
+                    Created
+                </div>
+    
+            </div>
+    
+    
+            <!-- Pending Submissions -->
+    
+            <div class="stat-card attendance"
+                 onclick="location.href='{% url 'faculty_submissions' %}'">
+    
+                <div class="stat-header">
+                    <div class="stat-icon orange">📥</div>
+                </div>
+    
+                <div class="stat-label">
+                    Pending
+                </div>
+    
+                <div class="stat-value">
+                    {{ pending_submissions }}
+                </div>
+    
+                <div class="stat-subtitle">
+                    Student submissions
+                </div>
+    
+            </div>
+    
+    
+            <!-- Notices -->
+    
+            <div class="stat-card notices"
+                 onclick="location.href='{% url 'faculty_notices' %}'">
+    
+                <div class="stat-header">
+                    <div class="stat-icon green">📢</div>
+                </div>
+    
+                <div class="stat-label">
+                    Notices
+                </div>
+    
+                <div class="stat-value">
+                    {{ total_notices }}
+                </div>
+    
+                <div class="stat-subtitle">
+                    Created
+                </div>
+    
+            </div>
+    
+    
+            <!-- Events -->
+    
+            <div class="stat-card timetable"
+                 onclick="location.href='{% url 'faculty_events' %}'">
+    
+                <div class="stat-header">
+                    <div class="stat-icon indigo">🎉</div>
+                </div>
+    
+                <div class="stat-label">
+                    Events
+                </div>
+    
+                <div class="stat-value">
+                    {{ total_events }}
+                </div>
+    
+                <div class="stat-subtitle">
+                    In-charge
+                </div>
+    
+            </div>
+    
+        </div>
+    
+    
+    
+        <!-- Activity Section -->
+    
+        <div class="activity-section">
+    
+    
+            <!-- Recent Assignments -->
+    
+            <div class="activity-card">
+    
+                <div class="activity-header">
+    
+                    <h2 class="activity-title">
+                        Recent Assignments
+                    </h2>
+    
+                    <a href="{% url 'faculty_assignments' %}"
+                       class="view-all-link">
+    
+                        View All →
+    
+                    </a>
+    
+                </div>
+    
+    
+                {% for assignment in recent_assignments %}
+    
+                <a href="#"
+                   class="activity-item">
+    
+                    <div class="activity-item-content">
+    
+                        <div class="activity-info">
+    
+                            <div class="activity-item-title">
+    
+                                {{ assignment.title }}
+    
+                            </div>
+    
+                            <div class="activity-item-meta">
+    
+                                <span>📚</span>
+    
+                                <span>
+    
+                                    {{ assignment.faculty_subject.subject.name }}
+    
+                                </span>
+    
+                            </div>
+    
+                            <div class="activity-item-meta">
+    
+                                <span>📅</span>
+    
+                                <span>
+    
+                                    Due:
+                                    {{ assignment.due_date }}
+    
+                                </span>
+    
+                            </div>
+    
+                        </div>
+    
+                        <span class="activity-badge badge-pending">
+    
+                            Active
+    
+                        </span>
+    
+                    </div>
+    
+                </a>
+    
+                {% empty %}
+    
+                <div class="empty-state">
+    
+                    <div class="empty-icon">
+                        📝
+                    </div>
+    
+                    <div class="empty-text">
+    
+                        No assignments created yet.
+    
+                    </div>
+    
+                </div>
+    
+                {% endfor %}
+    
+            </div>
+    
+    
+    
+            <!-- Upcoming Events -->
+    
+            <div class="activity-card">
+    
+                <div class="activity-header">
+    
+                    <h2 class="activity-title">
+    
+                        Upcoming Events
+    
+                    </h2>
+    
+                    <a href="{% url 'faculty_events' %}"
+                       class="view-all-link">
+    
+                        View All →
+    
+                    </a>
+    
+                </div>
+    
+    
+                {% for event in upcoming_events %}
+    
+                <a href="{% url 'event_detail' event.id %}"
+                   class="activity-item">
+    
+                    <div class="activity-item-content">
+    
+                        <div class="activity-info">
+    
+                            <div class="activity-item-title">
+    
+                                {{ event.title }}
+    
+                            </div>
+    
+                            <div class="activity-item-meta">
+    
+                                <span>📅</span>
+    
+                                <span>
+    
+                                    {{ event.event_date }}
+    
+                                </span>
+    
+                            </div>
+    
+                            <div class="activity-item-meta">
+    
+                                <span>📍</span>
+    
+                                <span>
+    
+                                    {{ event.venue }}
+    
+                                </span>
+    
+                            </div>
+    
+                        </div>
+    
+                        <span class="activity-badge badge-event">
+    
+                            Event
+    
+                        </span>
+    
+                    </div>
+    
+                </a>
+    
+                {% empty %}
+    
+                <div class="empty-state">
+    
+                    <div class="empty-icon">
+    
+                        🎉
+    
+                    </div>
+    
+                    <div class="empty-text">
+    
+                        No upcoming events.
+    
+                    </div>
+    
+                </div>
+    
+                {% endfor %}
+    
+            </div>
+
+            <!--Recent Notices Card-->
+
+            <div class="activity-card">
+
+                <div class="activity-header">
+            
+                    <h2 class="activity-title">
+                        Recent Notices
+                    </h2>
+            
+                    <a href="{% url 'faculty_notices' %}"
+                       class="view-all-link">
+                        View All →
+                    </a>
+            
+                </div>
+            
+                {% for notice in recent_notices %}
+            
+                <div class="activity-item">
+            
+                    <div class="activity-item-content">
+            
+                        <div class="activity-info">
+            
+                            <div class="activity-item-title">
+                                {{ notice.title }}
+                            </div>
+            
+                            <div class="activity-item-meta">
+                                <span>📅</span>
+                                <span>{{ notice.created_at|date:"d M Y" }}</span>
+                            </div>
+            
+                        </div>
+            
+                        <span class="activity-badge badge-event">
+                            {{ notice.notice_type }}
+                        </span>
+            
+                    </div>
+            
+                </div>
+            
+                {% empty %}
+            
+                <div class="empty-state">
+            
+                    <div class="empty-icon">
+                        📢
+                    </div>
+            
+                    <div class="empty-text">
+                        No notices created yet.
+                    </div>
+            
+                </div>
+            
+                {% endfor %}
+            
+            </div>
+        </div>
+    
+    </main>
+    
+    </body>

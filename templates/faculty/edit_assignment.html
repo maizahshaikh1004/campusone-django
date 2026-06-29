@@ -1,0 +1,109 @@
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+    
+            <a href="{% url 'faculty_assignments' %}" class="back-link">
+                ← Back to Assignments
+            </a>
+    
+        </div>
+    </nav>
+    
+    <main class="container">
+    
+    <div class="page-header">
+    
+    <h1>
+    Edit Assignment
+    </h1>
+    
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    <form
+    method="post"
+    enctype="multipart/form-data">
+    
+    {% csrf_token %}
+    
+    <label>Subject</label>
+    
+    <select
+    name="faculty_subject"
+    required>
+    
+    <option value="">
+    Select Subject
+    </option>
+    
+    {% for fs in faculty_subjects %}
+    
+    <option value="{{ fs.id }}" {% if fs.id == assignment.faculty_subject.id %} 
+    selected {% endif %}>
+    
+    {{ fs.subject.name }}
+    -
+    {{ fs.subject.academic_class }}
+    
+    </option>
+    
+    {% endfor %}
+    
+    </select>
+    
+    <label>Title</label>
+    
+    <input
+    type="text"
+    name="title"
+    value={{assignment.title}}
+    required>
+    
+    <label>Description</label>
+    
+    <textarea
+    name="description"
+    rows="5">{{assignment.description}}</textarea>
+    
+    <label>Due Date</label>
+    
+    <input
+    type="date"
+    name="due_date"
+    value={{assignment.due_date|date:'Y-m-d'}}
+    min="{{ today|date:'Y-m-d'}}"
+    required>
+    
+    <label>Question Paper</label>
+    
+    {% if assignment.question_file %}
+    <p>
+        Current File:
+        <a href="{{assignment.question_file.url}}" target="_blank">View Question Paper
+            </a>
+            </p>
+    {% endif %}
+    <input
+    type="file"
+    name="question_file">
+    
+    <br><br>
+    
+    <button
+    type="submit">
+    
+    Save Changes
+    
+    </button>
+    
+    </form>
+    
+    </main>
+    
+    </body>

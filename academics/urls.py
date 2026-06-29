@@ -11,5 +11,7 @@ urlpatterns = [
     path('student/timetable/',views.student_timetable,name="student_timetable"),
     path("student/coordinator-events/",views.student_coordinator_events,name="student_coordinator_events"),
     path("student/past-coordinator-events/",views.student_past_coordinator_events,name="student_past_coordinator_events"),
-    
+    path("subjects/",views.faculty_subjects,name="faculty_subjects"),
+    path("notices/",views.faculty_notices,name="faculty_notices"),
+    path("events/",views.faculty_events,name="faculty_events"),
 ]

@@ -7,7 +7,7 @@ from django.db.models import Q
 from users.models import Profile
 from django.utils import timezone
 from datetime import datetime
-from academics.models import Notice, Event, EventCoordinator, Subject, AttendanceRecord
+from academics.models import Notice, Event, EventCoordinator, Subject, AttendanceRecord, FacultySubject
 
 # Create your views here.
 
@@ -395,3 +395,53 @@ def student_past_coordinator_events(request):
             "past_events": past_events
         }
     )
+
+
+@login_required
+def faculty_subjects(request):
+
+    profile = request.user.profile
+
+    if profile.role != "FACULTY":
+        return render(
+            request,
+            "403.html",
+            {
+                "message": "Faculty Only."
+            },
+            status=403
+        )
+
+    subjects = (
+        FacultySubject.objects.filter(
+            faculty=profile
+        )
+        .select_related(
+            "subject",
+            "subject__academic_class",
+            "subject__academic_class__department"
+        )
+        .order_by(
+            "subject__name"
+        )
+    )
+
+    context = {
+        "subjects": subjects
+    }
+
+    return render(
+        request,
+        "faculty/faculty_subjects.html",
+        context
+    )
+
+
+@login_required
+def faculty_notices(request):
+    return HttpResponse("Faculty Notices - Coming Soon")
+
+
+@login_required
+def faculty_events(request):
+    return HttpResponse("Faculty Events - Coming Soon")

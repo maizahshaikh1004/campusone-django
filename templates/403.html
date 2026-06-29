@@ -1,0 +1,27 @@
+<body>
+
+    <div class="error-container">
+        <div class="error-icon">🔒</div>
+        <div class="error-code">403</div>
+        <h1 class="error-title">Access Denied</h1>
+        <p class="error-message">
+            {{ message|default:"You don't have permission to access this resource." }}
+        </p>
+        <div class="error-actions">
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <span>←</span>
+                <span>Go Back</span>
+            </a>
+            
+            <a href="
+            {% if request.user.profile.role == 'ADMIN' %}{% url 'admin_dashboard' %}
+            {% elif request.user.profile.role == 'FACULTY' %}{% url 'faculty_dashboard' %}
+            {% else %}{% url 'student_dashboard' %}{% endif %}
+            " class="btn btn-primary">
+                <span>🏠</span>
+                <span>Dashboard</span>
+            </a>
+        </div>
+    </div>
+    
+    </body>

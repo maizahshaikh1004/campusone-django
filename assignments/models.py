@@ -16,6 +16,10 @@ class Assignment(models.Model):
         if self.pk is None and self.due_date < date.today():
             raise ValidationError("Due date cannot be in the past.")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
     

@@ -1,0 +1,98 @@
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+    
+            <a href="{% url 'faculty_assignments' %}" class="back-link">
+                ← Back to Assignments
+            </a>
+    
+        </div>
+    </nav>
+    
+    <main class="container">
+    
+    <div class="page-header">
+    
+    <h1>
+    📝 Create Assignment
+    </h1>
+    
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    <form
+    method="post"
+    enctype="multipart/form-data">
+    
+    {% csrf_token %}
+    
+    <label>Subject</label>
+    
+    <select
+    name="faculty_subject"
+    required>
+    
+    <option value="">
+    Select Subject
+    </option>
+    
+    {% for fs in faculty_subjects %}
+    
+    <option value="{{ fs.id }}">
+    
+    {{ fs.subject.name }}
+    -
+    {{ fs.subject.academic_class }}
+    
+    </option>
+    
+    {% endfor %}
+    
+    </select>
+    
+    <label>Title</label>
+    
+    <input
+    type="text"
+    name="title"
+    required>
+    
+    <label>Description</label>
+    
+    <textarea
+    name="description"
+    rows="5"></textarea>
+    
+    <label>Due Date</label>
+    
+    <input
+    type="date"
+    name="due_date"
+    required>
+    
+    <label>Question Paper</label>
+    
+    <input
+    type="file"
+    name="question_file">
+    
+    <br><br>
+    
+    <button
+    type="submit">
+    
+    Create Assignment
+    
+    </button>
+    
+    </form>
+    
+    </main>
+    
+    </body>
