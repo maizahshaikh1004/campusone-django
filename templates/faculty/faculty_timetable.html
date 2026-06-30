@@ -1,0 +1,53 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_dashboard' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Dashboard</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>🗓️</span>
+            <span>My Timetable</span>
+        </h1>
+    </div>
+
+    <div class="table-responsive">
+        <table class="timetable-grid">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    {% for day in days %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in grid %}
+                    <tr>
+                        <td class="time-slot"><strong>{{ row.time }}</strong></td>
+                        {% for cell in row.cells %}
+                            <td>
+                                {% if cell != '---' %}
+                                    <div class="timetable-card">
+                                        {{ cell }}
+                                    </div>
+                                {% else %}
+                                    <span class="empty-slot">—</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>

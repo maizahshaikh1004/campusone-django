@@ -1,0 +1,67 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_dashboard' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Dashboard</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>👁️</span>
+            <span>View Attendance Records</span>
+        </h1>
+        {% if records %}
+        <div class="count-badge">{{ records|length }} Record{{ records|length|pluralize }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Attendance Table -->
+    {% if records %}
+        <div class="table-responsive">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                        <tr>
+                            <td><strong>{{ r.student.full_name }}</strong></td>
+                            <td>{{ r.attendance_session.timetable.faculty_subject.subject.name }}</td>
+                            <td>{{ r.attendance_session.lecture_date|date:"d M Y" }}</td>
+                            <td>{{ r.attendance_session.timetable.day|title }}</td>
+                            <td>{{ r.attendance_session.timetable.start_time|time:"H:i" }} - {{ r.attendance_session.timetable.end_time|time:"H:i" }}</td>
+                            <td>
+                                {% if r.is_present %}
+                                    <span class="status-badge status-present">Present</span>
+                                {% else %}
+                                    <span class="status-badge status-absent">Absent</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>No Attendance Marked Yet</h3>
+            <p>Go to "Mark Attendance" to submit records.</p>
+        </div>
+    {% endif %}
+</main>

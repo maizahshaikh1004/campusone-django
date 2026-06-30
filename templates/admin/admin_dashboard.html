@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - CampusOne</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f8f9fa;
+        color: #1e293b;
+        min-height: 100vh;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+    body.dark-mode { background: #0f172a; color: #e2e8f0; }
+
+    /* Navbar */
+    .navbar {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    body.dark-mode .navbar { background: #1e293b; border-bottom: 1px solid #334155; }
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2563eb;
+    }
+    body.dark-mode .logo { color: #60a5fa; }
+    .logo-icon { font-size: 1.5rem; }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+    .nav-btn {
+        color: #475569;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    body.dark-mode .nav-btn { color: #cbd5e1; }
+    .nav-btn:hover { background: #f1f5f9; }
+    body.dark-mode .nav-btn:hover { background: #334155; }
+    
+    .theme-toggle {
+        background: #f1f5f9;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+    }
+    .theme-toggle:hover { background: #e2e8f0; transform: scale(1.05); }
+    body.dark-mode .theme-toggle { background: #334155; }
+
+    /* Main Grid layout */
+    .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.75rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; }
+    body.dark-mode .page-header h1 { color: #f1f5f9; }
+    .page-header p { font-size: 0.95rem; color: #64748b; }
+    body.dark-mode .page-header p { color: #94a3b8; }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 2px solid transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    body.dark-mode .stat-card { background: #1e293b; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-color: #2563eb; }
+    body.dark-mode .stat-card:hover { border-color: #60a5fa; }
+    
+    .stat-value { font-size: 2rem; font-weight: 700; color: #0f172a; margin-top: 0.25rem; }
+    body.dark-mode .stat-value { color: #f1f5f9; }
+    .stat-label { font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    body.dark-mode .stat-label { color: #94a3b8; }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .stat-icon.blue { background: #dbeafe; color: #1e40af; }
+    .stat-icon.green { background: #dcfce7; color: #15803d; }
+    .stat-icon.amber { background: #fef3c7; color: #b45309; }
+    .stat-icon.purple { background: #ede9fe; color: #6d28d9; }
+
+    /* Actions Grid */
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; color: #0f172a; display: flex; align-items: center; gap: 0.5rem; }
+    body.dark-mode .section-title { color: #f1f5f9; }
+    .categories-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .action-category {
+        background: white;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    body.dark-mode .action-category { background: #1e293b; }
+    .category-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #475569; }
+    body.dark-mode .category-title { color: #cbd5e1; }
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .action-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    body.dark-mode .action-card { background: #0f172a; border-color: #334155; }
+    .action-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    body.dark-mode .action-card:hover { border-color: #60a5fa; }
+    .action-icon { font-size: 1.5rem; }
+    .action-label { font-size: 0.85rem; font-weight: 600; color: #334155; }
+    body.dark-mode .action-label { color: #e2e8f0; }
+
+    /* Recent Grid Layout */
+    .recent-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+    .recent-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    body.dark-mode .recent-card { background: #1e293b; }
+    .recent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; }
+    body.dark-mode .recent-header { border-bottom-color: #334155; }
+    .recent-header h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+    body.dark-mode .recent-header h3 { color: #f1f5f9; }
+    .view-all-link { font-size: 0.85rem; color: #2563eb; text-decoration: none; font-weight: 600; }
+    body.dark-mode .view-all-link { color: #60a5fa; }
+    .view-all-link:hover { text-decoration: underline; }
+    
+    .recent-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid #f8fafc; }
+    body.dark-mode .recent-item { border-bottom-color: #293548; }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-item-icon { width: 36px; height: 36px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    body.dark-mode .recent-item-icon { background: #0f172a; }
+    .recent-item-content { flex: 1; min-width: 0; }
+    .recent-item-title { font-size: 0.9rem; font-weight: 600; color: #1e293b; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    body.dark-mode .recent-item-title { color: #e2e8f0; }
+    .recent-item-title:hover { color: #2563eb; }
+    body.dark-mode .recent-item-title:hover { color: #60a5fa; }
+    .recent-item-date { font-size: 0.75rem; color: #64748b; margin-top: 0.15rem; }
+    body.dark-mode .recent-item-date { color: #94a3b8; }
+    
+    .empty-state { text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: 0.9rem; }
+    .badge { padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .badge.student { background: #dbeafe; color: #1e40af; }
+    .badge.faculty { background: #ede9fe; color: #6d28d9; }
+</style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <span class="logo-icon">🎓</span>
+            <span>CampusOne Admin</span>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <a href="{% url 'profile' %}" class="nav-btn">
+                <span>👤</span>
+                <span>Profile</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-btn">
+                <span>🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Dashboard Overview</h1>
+        <p>Manage your campus operations from one place</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="location.href='{% url 'admin_students_list' %}'">
+            <div>
+                <div class="stat-label">Total Students</div>
+                <div class="stat-value">{{ total_students }}</div>
+            </div>
+            <div class="stat-icon blue">👥</div>
+        </div>
+
+        <div class="stat-card" onclick="location.href='{% url 'admin_all_faculty' %}'">
+            <div>
+                <div class="stat-label">Total Faculty</div>
+                <div class="stat-value">{{ total_faculty }}</div>
+            </div>
+            <div class="stat-icon purple">👨‍🏫</div>
+        </div>
+
+        <div class="stat-card" onclick="location.href='{% url 'admin_registration_requests' %}'">
+            <div>
+                <div class="stat-label">Pending Signups</div>
+                <div class="stat-value">{{ pending_registrations }}</div>
+            </div>
+            <div class="stat-icon green">⏳</div>
+        </div>
+
+        <div class="stat-card" onclick="location.href='{% url 'attendance_corrections_admin' %}'">
+            <div>
+                <div class="stat-label">Pending Corrections</div>
+                <div class="stat-value">{{ pending_corrections }}</div>
+            </div>
+            <div class="stat-icon amber">✏️</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions - Organized by Category -->
+    <div class="actions-section" style="margin-bottom: 2.5rem;">
+        <h2 class="section-title">⚡ Quick Actions</h2>
+
+        <div class="categories-container">
+            <!-- Communication & Announcements -->
+            <div class="action-category">
+                <div class="category-title">
+                    <span>📢</span>
+                    <span>Announcements</span>
+                </div>
+                <div class="actions-grid">
+                    <a href="{% url 'create_notice' %}" class="action-card">
+                        <div class="action-icon">📝</div>
+                        <div class="action-label">Create Notice</div>
+                    </a>
+                    <a href="{% url 'admin_notices' %}" class="action-card">
+                        <div class="action-icon">📄</div>
+                        <div class="action-label">View Notices</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Events & Activities -->
+            <div class="action-category">
+                <div class="category-title">
+                    <span>🎉</span>
+                    <span>Events & Activities</span>
+                </div>
+                <div class="actions-grid">
+                    <a href="{% url 'create_event' %}" class="action-card">
+                        <div class="action-icon">➕</div>
+                        <div class="action-label">Create Event</div>
+                    </a>
+                    <a href="{% url 'admin_events' %}" class="action-card">
+                        <div class="action-icon">📅</div>
+                        <div class="action-label">Manage Events</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="action-category">
+                <div class="category-title">
+                    <span>👥</span>
+                    <span>User Management</span>
+                </div>
+                <div class="actions-grid">
+                    <a href="{% url 'admin_registration_requests' %}" class="action-card">
+                        <div class="action-icon">✅</div>
+                        <div class="action-label">Signups</div>
+                    </a>
+                    <a href="{% url 'bulk_user_upload' %}" class="action-card">
+                        <div class="action-icon">📥</div>
+                        <div class="action-label">Bulk Upload</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Academic Operations -->
+            <div class="action-category">
+                <div class="category-title">
+                    <span>📚</span>
+                    <span>Academic Operations</span>
+                </div>
+                <div class="actions-grid">
+                    <a href="{% url 'admin_timetable' %}" class="action-card">
+                        <div class="action-icon">🗓️</div>
+                        <div class="action-label">Timetable</div>
+                    </a>
+                    <a href="{% url 'admin_attendance_report' %}" class="action-card">
+                        <div class="action-icon">📊</div>
+                        <div class="action-label">Attendance</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-grid">
+        <!-- Recent Registration Requests -->
+        <div class="recent-card">
+            <div class="recent-header">
+                <h3>Latest Signup Requests</h3>
+                <a href="{% url 'admin_registration_requests' %}" class="view-all-link">View all →</a>
+            </div>
+            {% if recent_registrations %}
+                {% for r in recent_registrations %}
+                <div class="recent-item">
+                    <div class="recent-item-icon">⏳</div>
+                    <div class="recent-item-content">
+                        <span class="recent-item-title">{{ r.name }}</span>
+                        <div class="recent-item-date">
+                            {{ r.email }} • <span class="badge {% if r.role == 'STUDENT' %}student{% else %}faculty{% endif %}">{{ r.role }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No pending signups</div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Notices -->
+        <div class="recent-card">
+            <div class="recent-header">
+                <h3>Recent Notices</h3>
+                <a href="{% url 'admin_notices' %}" class="view-all-link">View all →</a>
+            </div>
+            {% if recent_notices %}
+                {% for n in recent_notices %}
+                <div class="recent-item">
+                    <div class="recent-item-icon">📋</div>
+                    <div class="recent-item-content">
+                        <a href="{% url 'notice_detail' n.id %}" class="recent-item-title">{{ n.title }}</a>
+                        <div class="recent-item-date">{{ n.created_at|date:"d M Y" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No notices yet</div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Events -->
+        <div class="recent-card">
+            <div class="recent-header">
+                <h3>Upcoming Events</h3>
+                <a href="{% url 'admin_events' %}" class="view-all-link">View all →</a>
+            </div>
+            {% if upcoming_events %}
+                {% for e in upcoming_events %}
+                <div class="recent-item">
+                    <div class="recent-item-icon">🎊</div>
+                    <div class="recent-item-content">
+                        <a href="{% url 'event_detail' e.id %}" class="recent-item-title">{{ e.title }}</a>
+                        <div class="recent-item-date">{{ e.event_date|date:"d M Y" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No events yet</div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Dark mode toggle functionality
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const body = document.body;
+
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+    body.classList.add('dark-mode');
+    themeIcon.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+    }
+});
+</script>
+
+</body>
+</html>

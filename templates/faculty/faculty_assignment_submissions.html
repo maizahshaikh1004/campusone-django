@@ -1,0 +1,159 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_dashboard' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Dashboard</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>📥</span>
+            <span>Assignment Submissions</span>
+        </h1>
+    </div>
+
+    <!-- Assignment Selector Card -->
+    <div class="selector-card">
+        <label class="selector-label">Select Assignment</label>
+        <form method="get">
+            <select name="assignment_id" onchange="this.form.submit()" required>
+                <option value="">— Choose an assignment —</option>
+                {% for a in assignments %}
+                    <option value="{{ a.id }}" {% if a.id|stringformat:"s" == selected_assignment_id|stringformat:"s" %}selected{% endif %}>
+                        {{ a.faculty_subject.subject.name }} • {{ a.title }} • Due {{ a.due_date|date:"d M Y" }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if selected_assignment_id %}
+
+        <!-- Filter Panel -->
+        <div class="filter-panel">
+            <div class="student-count">
+                <span>📊 Total Students:</span>
+                <span class="count-num" id="totalCount">{{ total_students }}</span>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="ontime">✓ On Time</button>
+                <button class="filter-tab" data-filter="late">⏰ Late</button>
+                <button class="filter-tab" data-filter="pending">⏳ Pending</button>
+            </div>
+        </div>
+
+        <!-- Submissions List -->
+        <div class="submissions-list">
+
+            <!-- Submitted Students -->
+            {% for s in submissions %}
+                <div class="submission-card" data-status="{% if s.is_late %}late{% else %}ontime{% endif %}">
+                    <div class="card-header">
+                        <div class="student-info">
+                            <div>
+                                <span class="student-avatar">{{ s.student.full_name|slice:":1"|upper }}</span>
+                                <span class="student-name">{{ s.student.full_name }}</span>
+                            </div>
+                            <div class="student-id">ID: {{ s.student.id }}</div>
+                            <div class="submission-time">
+                                <span>📅</span>
+                                <span>Submitted: {{ s.submitted_at|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+
+                        {% if s.is_late %}
+                            <span class="status-badge badge-late">
+                                <span>⏰</span>
+                                <span>Late</span>
+                            </span>
+                        {% else %}
+                            <span class="status-badge badge-ontime">
+                                <span>✓</span>
+                                <span>On Time</span>
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {% if s.submission_file %}
+                        <a href="{{ s.submission_file.url }}" target="_blank" class="btn-view">
+                            <span>📄</span>
+                            <span>View Submission</span>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <!-- Pending Students -->
+            {% for p in pending_students %}
+                <div class="submission-card" data-status="pending">
+                    <div class="card-header">
+                        <div class="student-info">
+                            <div>
+                                <span class="student-avatar">{{ p.full_name|slice:":1"|upper }}</span>
+                                <span class="student-name">{{ p.full_name }}</span>
+                            </div>
+                            <div class="student-id">ID: {{ p.id }}</div>
+                            <div class="submission-time">
+                                <span>⚠️</span>
+                                <span>Not Submitted Yet</span>
+                            </div>
+                        </div>
+
+                        <span class="status-badge badge-pending">
+                            <span>⏳</span>
+                            <span>Pending</span>
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if not submissions and not pending_students %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Students Found</h3>
+                    <p>No students enrolled for this assignment.</p>
+                </div>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+</main>
+
+<script>
+// Filter tabs
+const filterTabs = document.querySelectorAll('.filter-tab');
+const cards = document.querySelectorAll('.submission-card');
+const countNum = document.getElementById('totalCount');
+
+filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Update active tab
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Filter cards
+        const filter = tab.dataset.filter;
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const status = card.dataset.status;
+            const isVisible = (filter === 'all') || (status === filter);
+            card.style.display = isVisible ? 'block' : 'none';
+            if (isVisible) visibleCount++;
+        });
+
+        // Update count
+        if (countNum) countNum.textContent = visibleCount;
+    });
+});
+</script>

@@ -169,9 +169,58 @@
     
             </div>
     
+            <!-- Timetable -->
+            <div class="stat-card timetable-schedule"
+                 onclick="location.href='{% url 'faculty_timetable' %}'">
+                <div class="stat-header">
+                    <div class="stat-icon purple" style="background-color: #f3e8ff; color: #7c3aed;">🗓️</div>
+                </div>
+                <div class="stat-label">
+                    Timetable
+                </div>
+                <div class="stat-value" style="font-size: 1.5rem;">
+                    View
+                </div>
+                <div class="stat-subtitle">
+                    My Schedule
+                </div>
+            </div>
+    
         </div>
     
     
+        <!-- Quick Actions / Attendance Module -->
+        <div class="section-header" style="margin-top: 40px; margin-bottom: 15px;">
+            <h2 class="activity-title" style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span>⚡</span> Quick Actions & Attendance
+            </h2>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 40px;">
+            <a href="{% url 'mark_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+                <div class="stat-icon green" style="margin: 0 auto 10px; background-color: #dcfce7; color: #15803d;">✓</div>
+                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Mark Attendance</div>
+                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Record daily presence</div>
+            </a>
+
+            <a href="{% url 'faculty_view_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+                <div class="stat-icon blue" style="margin: 0 auto 10px; background-color: #dbeafe; color: #1d4ed8;">📊</div>
+                <div class="stat-label" style="font-weight: 600; color: #1f2937;">View Attendance</div>
+                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">View past records</div>
+            </a>
+
+            <a href="{% url 'faculty_attendance_report' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+                <div class="stat-icon orange" style="margin: 0 auto 10px; background-color: #ffedd5; color: #c2410c;">📈</div>
+                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Attendance Report</div>
+                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Check percentage statistics</div>
+            </a>
+
+            <a href="{% url 'request_attendance_correction' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+                <div class="stat-icon purple" style="margin: 0 auto 10px; background-color: #f3e8ff; color: #7c3aed;">🛠️</div>
+                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Corrections</div>
+                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Request changes</div>
+            </a>
+        </div>
     
         <!-- Activity Section -->
     

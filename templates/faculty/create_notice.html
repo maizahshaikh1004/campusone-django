@@ -1,0 +1,136 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_notices' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Notices</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>📢</span>
+            <span>Create Notice</span>
+        </h1>
+        <p>Post an announcement to your students or department</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="message-toast {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="notice-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="title">Title *</label>
+            <input type="text" id="title" name="title" placeholder="Enter notice title..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content *</label>
+            <textarea id="content" name="content" placeholder="Write your notice here..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="attachmentInput">Attachment (optional)</label>
+            <input type="file" name="attachment" id="attachmentInput">
+        </div>
+
+        <div class="form-group">
+            <label>Scope *</label>
+            <div class="scope-options">
+                <label>
+                    <input type="radio" name="scope" id="scope_global" value="GLOBAL" checked onchange="handleScopeChange()">
+                    <span>🌐 Global</span>
+                </label>
+                <label>
+                    <input type="radio" name="scope" id="scope_dept" value="DEPARTMENT" onchange="handleScopeChange()">
+                    <span>🏢 Department / Semester</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="scope-target" id="scopeTarget" style="display: none;">
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select name="department_id" id="department">
+                    <option value="">— Select Department —</option>
+                    {% for d_id, d_name in departments %}
+                    <option value="{{ d_id }}">{{ d_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="semester">Semester (optional)</label>
+                <select name="semester_id" id="semester" disabled>
+                    <option value="">— Select Department first —</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <a href="{% url 'faculty_notices' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-submit">Post Notice</button>
+        </div>
+    </form>
+</main>
+
+<script>
+function handleScopeChange() {
+    const isDept = document.getElementById('scope_dept').checked;
+    const target = document.getElementById('scopeTarget');
+    const deptSel = document.getElementById('department');
+    const semSel = document.getElementById('semester');
+
+    if (isDept) {
+        target.style.display = 'block';
+    } else {
+        target.style.display = 'none';
+        deptSel.value = '';
+        semSel.innerHTML = '<option value="">— Select Department first —</option>';
+        semSel.disabled = true;
+    }
+}
+
+document.getElementById('department').addEventListener('change', function () {
+    const deptId = this.value;
+    const semSelect = document.getElementById('semester');
+
+    if (!deptId) {
+        semSelect.innerHTML = '<option value="">— Select Department first —</option>';
+        semSelect.disabled = true;
+        return;
+    }
+
+    semSelect.innerHTML = '<option value="">Loading...</option>';
+    semSelect.disabled = true;
+
+    fetch(`/ajax/get-semesters/?department_id=${deptId}`)
+        .then(r => r.json())
+        .then(data => {
+            semSelect.innerHTML = '<option value="">— All Semesters —</option>';
+            data.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `Semester ${s.number}`;
+                semSelect.appendChild(opt);
+            });
+            semSelect.disabled = false;
+        })
+        .catch(() => {
+            semSelect.innerHTML = '<option value="">Error loading semesters</option>';
+        });
+});
+</script>

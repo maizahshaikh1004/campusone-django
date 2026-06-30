@@ -1,0 +1,139 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_events' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Events</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>🎉</span>
+            <span>Create Event</span>
+        </h1>
+        <p>Organize a college event and assign details</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="message-toast {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="event-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="title">Event Title *</label>
+            <input type="text" id="title" name="title" placeholder="Enter event title..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Write description..."></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="event_date">Event Date *</label>
+                <input type="date" id="event_date" name="event_date" required>
+            </div>
+            <div class="form-group">
+                <label for="start_time">Start Time *</label>
+                <input type="time" id="start_time" name="start_time" required>
+            </div>
+            <div class="form-group">
+                <label for="end_time">End Time *</label>
+                <input type="time" id="end_time" name="end_time" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="venue">Venue *</label>
+            <input type="text" id="venue" name="venue" placeholder="e.g. Seminar Hall, Lab 1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="google_form_link">Google Form Link (Registration/Feedback)</label>
+            <input type="url" id="google_form_link" name="google_form_link" placeholder="https://forms.gle/...">
+        </div>
+
+        <div class="form-group">
+            <label for="posterInput">Event Poster (optional)</label>
+            <input type="file" name="poster" id="posterInput">
+        </div>
+
+        {% if role == 'ADMIN' %}
+            <div class="form-group">
+                <label for="faculty_incharge">Faculty In-Charge *</label>
+                <select name="faculty_incharge_id" id="faculty_incharge" required>
+                    <option value="">— Select Faculty —</option>
+                    {% for f_id, f_name in faculties %}
+                    <option value="{{ f_id }}">{{ f_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label>Target Audience (Department / Class)</label>
+            <div class="scope-target-row">
+                <select name="department_id" id="department">
+                    <option value="">— Global Event —</option>
+                    {% for d_id, d_name in departments %}
+                    <option value="{{ d_id }}">{{ d_name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="semester_id" id="semester" disabled>
+                    <option value="">— Select Department first —</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <a href="{% url 'faculty_events' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-submit">Create Event</button>
+        </div>
+    </form>
+</main>
+
+<script>
+document.getElementById('department').addEventListener('change', function () {
+    const deptId = this.value;
+    const semSelect = document.getElementById('semester');
+
+    if (!deptId) {
+        semSelect.innerHTML = '<option value="">— Global Event —</option>';
+        semSelect.disabled = true;
+        return;
+    }
+
+    semSelect.innerHTML = '<option value="">Loading...</option>';
+    semSelect.disabled = true;
+
+    fetch(`/ajax/get-semesters/?department_id=${deptId}`)
+        .then(r => r.json())
+        .then(data => {
+            semSelect.innerHTML = '<option value="">— All Semesters —</option>';
+            data.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `Semester ${s.number}`;
+                semSelect.appendChild(opt);
+            });
+            semSelect.disabled = false;
+        })
+        .catch(() => {
+            semSelect.innerHTML = '<option value="">Error loading semesters</option>';
+        });
+});
+</script>

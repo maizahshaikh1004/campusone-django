@@ -6,6 +6,7 @@ from django.contrib import messages
 from academics.models import FacultySubject
 from django.core.exceptions import ValidationError
 from datetime import date
+from users.models import Profile
 
 
 @login_required
@@ -305,4 +306,40 @@ def delete_assignment(request, assignment_id):
 
 @login_required
 def faculty_submissions(request):
-    return HttpResponse("Assignment Submissions - Coming Soon")
+    profile = request.user.profile
+    if profile.role != 'FACULTY':
+        return render(request, '403.html', {'message': 'Faculty Only.'}, status=403)
+
+    selected_assignment_id = request.GET.get('assignment_id')
+    
+    assignments_qs = Assignment.objects.filter(
+        faculty_subject__faculty=profile
+    ).select_related('faculty_subject__subject').order_by('-due_date')
+
+    submissions_qs = []
+    pending_students_qs = []
+    total_students = 0
+
+    if selected_assignment_id:
+        assignment = get_object_or_404(Assignment, id=selected_assignment_id, faculty_subject__faculty=profile)
+        class_students = Profile.objects.filter(
+            role='STUDENT',
+            academic_class=assignment.faculty_subject.subject.academic_class,
+            user__is_active=True
+        ).order_by('full_name')
+
+        submissions_qs = AssignmentSubmission.objects.filter(
+            assignment=assignment
+        ).select_related('student')
+
+        submitted_student_ids = submissions_qs.values_list('student_id', flat=True)
+        pending_students_qs = class_students.exclude(id__in=submitted_student_ids)
+        total_students = class_students.count()
+
+    return render(request, 'faculty/faculty_assignment_submissions.html', {
+        'assignments': assignments_qs,
+        'submissions': submissions_qs,
+        'pending_students': pending_students_qs,
+        'selected_assignment_id': selected_assignment_id,
+        'total_students': total_students
+    })

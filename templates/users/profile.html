@@ -4,9 +4,9 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="
-    {% if request.session.role == 'ADMIN' %}
+    {% if request.user.profile.role == 'ADMIN' %}
         {% url 'admin_dashboard' %}
-    {% elif request.session.role == 'FACULTY' %}
+    {% elif request.user.profile.role == 'FACULTY' %}
         {% url 'faculty_dashboard' %}
     {% else %}
         {% url 'student_dashboard' %}

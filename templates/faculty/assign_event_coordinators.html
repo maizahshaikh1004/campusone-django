@@ -1,0 +1,67 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_events' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Events</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>👥</span>
+            <span>Assign Coordinators</span>
+        </h1>
+        <p>Manage student coordinators for your event (Max 2)</p>
+    </div>
+
+    {% if error %}
+        <div class="message-toast error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- Assigned List -->
+    <div class="assigned-section">
+        <h3>Assigned Coordinators ({{ assigned|length }}/2)</h3>
+        {% if assigned %}
+            <div class="coordinators-list">
+                {% for coord in assigned %}
+                    <div class="coordinator-chip">
+                        <span>👤 {{ coord.student.full_name }}</span>
+                        <form method="post" style="display:inline; margin-left:10px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="remove_id" value="{{ coord.student.id }}">
+                            <button type="submit" class="btn-remove-coord" onclick="return confirm('Remove this coordinator?');">✕</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No coordinators assigned yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Assign Form -->
+    {% if assigned|length < 2 %}
+        <form method="post" class="assign-form" style="margin-top: 30px;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="student">Select Student</label>
+                <select name="student_id" id="student" required>
+                    <option value="">— Select Student —</option>
+                    {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Add Coordinator</button>
+        </form>
+    {% endif %}
+</main>

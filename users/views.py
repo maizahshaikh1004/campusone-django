@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegistrationRequestForm, LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
+from .models import RegistrationRequest, Profile
+from django.core.mail import send_mail
 
 def register_request(request):
     if request.method=="POST":
@@ -171,3 +174,99 @@ def edit_profile(request):
             "profile": profile
         }
     )
+
+
+@login_required
+def admin_registration_requests_view(request):
+    if request.user.profile.role != 'ADMIN':
+        return render(request, '403.html', {'message': 'Admins Only.'}, status=403)
+
+    role_filter = request.GET.get('role', '')
+    sort_order = request.GET.get('sort', 'desc')
+
+    requests_qs = RegistrationRequest.objects.filter(status='PENDING')
+
+    if role_filter in ['STUDENT', 'FACULTY']:
+        requests_qs = requests_qs.filter(role=role_filter)
+
+    if sort_order == 'asc':
+        requests_qs = requests_qs.order_by('requested_at')
+    else:
+        requests_qs = requests_qs.order_by('-requested_at')
+
+    return render(request, 'admin/admin_registration_requests.html', {
+        'requests': requests_qs,
+        'selected_role': role_filter,
+        'selected_sort': sort_order,
+    })
+
+
+@login_required
+def approve_registration_view(request, request_id):
+    if request.user.profile.role != 'ADMIN':
+        return render(request, '403.html', {'message': 'Admins Only.'}, status=403)
+
+    req = get_object_or_404(RegistrationRequest, pk=request_id, status='PENDING')
+
+    base_username = req.name.lower().replace(" ", "")
+    username = base_username
+    counter = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base_username}{counter}"
+        counter += 1
+
+    # Create user as inactive
+    user = User.objects.create(
+        username=username,
+        email=req.email,
+        is_active=False
+    )
+    profile = user.profile
+    profile.full_name = req.name
+    profile.role = req.role
+    profile.department = req.department
+    profile.academic_class = req.academic_class
+    profile.save()
+
+    # Mark signup request approved
+    req.status = 'APPROVED'
+    req.reviewed_at = timezone.now()
+    req.save()
+
+    # Send password setup email
+    try:
+        subject = "CampusOne Account Activation & Password Setup"
+        message = (
+            f"Dear {req.name},\n\n"
+            f"Your registration request for the role of {req.role.title()} has been approved.\n"
+            f"Please click the following link to set your password and activate your account:\n"
+            f"http://127.0.0.1:8000/set-password/{user.id}/\n\n"
+            f"Best regards,\n"
+            f"CampusOne Administration"
+        )
+        send_mail(
+            subject,
+            message,
+            'noreply@campusone.com',
+            [req.email],
+            fail_silently=True
+        )
+        messages.success(request, f"Request approved. Activation email sent to {req.email}.")
+    except Exception as e:
+        messages.warning(request, f"Request approved, but failed to send activation email: {str(e)}")
+
+    return redirect('admin_registration_requests')
+
+
+@login_required
+def reject_registration_view(request, request_id):
+    if request.user.profile.role != 'ADMIN':
+        return render(request, '403.html', {'message': 'Admins Only.'}, status=403)
+
+    req = get_object_or_404(RegistrationRequest, pk=request_id, status='PENDING')
+    req.status = 'REJECTED'
+    req.reviewed_at = timezone.now()
+    req.save()
+
+    messages.success(request, f"Registration request for {req.name} has been rejected.")
+    return redirect('admin_registration_requests')

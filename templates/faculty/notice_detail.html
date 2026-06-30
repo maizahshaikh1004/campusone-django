@@ -1,0 +1,66 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="javascript:history.back()" class="back-link">
+            <span>←</span>
+            <span>Back</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="notice-card detail-card">
+        <div class="notice-header">
+            <h1 class="notice-title">{{ notice.title }}</h1>
+            <div class="notice-meta">
+                <div class="meta-item">
+                    <span>👤</span>
+                    <span>Posted by: {{ notice.created_by.full_name|default:notice.created_by.user.username }}</span>
+                </div>
+                <span class="meta-divider"></span>
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>{{ notice.created_at|date:"d M Y" }}</span>
+                </div>
+                {% if notice.department %}
+                    <span class="meta-divider"></span>
+                    <div class="meta-item">
+                        <span>🏢</span>
+                        <span>{{ notice.department.name }}</span>
+                    </div>
+                {% endif %}
+                {% if notice.academic_class %}
+                    <span class="meta-divider"></span>
+                    <div class="meta-item">
+                        <span>🎓</span>
+                        <span>{{ notice.academic_class.name }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="notice-content">
+            {{ notice.content|linebreaks }}
+        </div>
+
+        <div class="notice-footer">
+            {% if notice.attachment %}
+                <a href="{{ notice.attachment.url }}" target="_blank" class="attachment-btn">
+                    <span>📎</span>
+                    <span>Download Attachment</span>
+                </a>
+            {% endif %}
+
+            {% if notice.created_by.user == request.user or request.user.profile.role == 'ADMIN' %}
+                <div class="detail-actions">
+                    <a href="{% url 'edit_notice' notice.id %}" class="btn-edit">✏️ Edit</a>
+                    <a href="{% url 'delete_notice' notice.id %}" class="btn-delete" onclick="return confirm('Delete this notice?');">🗑️ Delete</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>

@@ -1,10 +1,10 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from academics.models import Subject,Notice, Event, EventCoordinator, AttendanceRecord, Timetable, FacultySubject
-from users.models import Profile
+from academics.models import Subject, Notice, Event, EventCoordinator, AttendanceRecord, Timetable, FacultySubject, AttendanceCorrectionRequest
+from users.models import Profile, RegistrationRequest
 from django.utils import timezone
 from assignments.models import Assignment, AssignmentSubmission
 from datetime import datetime
@@ -223,18 +223,25 @@ def faculty_dashboard(request):
 
     upcoming_events = (
         Event.objects.filter(
-            faculty_incharge=profile,
+            Q(created_by=profile) |
+            Q(faculty_incharge=profile) |
+            Q(event_type='GENERAL') |
+            Q(event_type='DEPARTMENT', department=profile.department) |
+            Q(event_type='CLASS', academic_class=profile.academic_class),
             is_active=True
         )
         .order_by("event_date")[:5]
     )
 
     recent_notices = (
-    Notice.objects.filter(
-        created_by=profile
+        Notice.objects.filter(
+            Q(created_by=profile) |
+            Q(notice_type='GENERAL') |
+            Q(notice_type='DEPARTMENT', department=profile.department) |
+            Q(notice_type='CLASS', academic_class=profile.academic_class)
+        )
+        .order_by("-created_at")[:5]
     )
-    .order_by("-created_at")[:5]
-)
 
     pending_submissions = 0
 
@@ -272,6 +279,7 @@ def faculty_dashboard(request):
 
         "recent_assignments": recent_assignments,
         "upcoming_events": upcoming_events,
+        "recent_notices": recent_notices,
     }
 
     return render(
@@ -279,3 +287,79 @@ def faculty_dashboard(request):
         "faculty/dashboard.html",
         context
     )
+
+
+@login_required
+def admin_dashboard(request):
+    profile = request.user.profile
+    if profile.role != 'ADMIN':
+        return render(request, '403.html', {'message': 'Admins Only.'}, status=403)
+
+    total_students = Profile.objects.filter(role='STUDENT').count()
+    total_faculty = Profile.objects.filter(role='FACULTY').count()
+    pending_registrations = RegistrationRequest.objects.filter(status='PENDING').count()
+    pending_corrections = AttendanceCorrectionRequest.objects.filter(status='PENDING').count()
+
+    recent_notices = Notice.objects.all().order_by('-created_at')[:5]
+    upcoming_events = Event.objects.filter(event_date__gte=timezone.now(), is_active=True).order_by('event_date')[:5]
+    recent_registrations = RegistrationRequest.objects.filter(status='PENDING').order_by('-requested_at')[:5]
+
+    context = {
+        'profile': profile,
+        'total_students': total_students,
+        'total_faculty': total_faculty,
+        'pending_registrations': pending_registrations,
+        'pending_corrections': pending_corrections,
+        'recent_notices': recent_notices,
+        'upcoming_events': upcoming_events,
+        'recent_registrations': recent_registrations,
+    }
+
+    return render(request, 'admin/admin_dashboard.html', context)
+
+
+@login_required
+def admin_students_list(request):
+    return HttpResponse("Admin Students List (Pending Implementation)")
+
+
+@login_required
+def admin_all_faculty(request):
+    return HttpResponse("Admin Faculty List (Pending Implementation)")
+
+
+@login_required
+def admin_events(request):
+    return HttpResponse("Admin Manage Events (Pending Implementation)")
+
+
+@login_required
+def admin_notices(request):
+    return HttpResponse("Admin Manage Notices (Pending Implementation)")
+
+
+@login_required
+def bulk_user_upload(request):
+    return HttpResponse("Admin Bulk Upload (Pending Implementation)")
+
+
+@login_required
+def admin_timetable(request):
+    return HttpResponse("Admin Timetable (Pending Implementation)")
+
+
+@login_required
+def admin_attendance_report(request):
+    return HttpResponse("Admin Attendance Report (Pending Implementation)")
+
+
+@login_required
+def attendance_corrections_admin(request):
+    return HttpResponse("Admin Attendance Corrections (Pending Implementation)")
+
+
+@login_required
+def admin_redirect(request):
+    if request.user.profile.role == 'ADMIN':
+        return redirect('admin_dashboard')
+    return redirect('home')

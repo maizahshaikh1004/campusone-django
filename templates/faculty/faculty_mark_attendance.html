@@ -1,0 +1,204 @@
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'faculty_dashboard' %}" class="back-link">
+            <span>←</span>
+            <span>Back to Dashboard</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main -->
+<main class="container">
+    <div class="page-header">
+        <h1>
+            <span>📝</span>
+            <span>Mark Attendance</span>
+        </h1>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="message-toast {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Filter Form -->
+    <form method="post" class="filter-form">
+        {% csrf_token %}
+        <input type="hidden" name="load_students" value="1">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="class_id">Class *</label>
+                <select name="class_id" id="class_id" required>
+                    <option value="">— Select Class —</option>
+                    {% for c in classes %}
+                        <option value="{{ c.id }}" {% if c.id|stringformat:"s" == selected_class_id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="subject_id">Subject *</label>
+                <select name="subject_id" id="subject_id" required {% if not selected_class_id %}disabled{% endif %}>
+                    <option value="">— Select Subject —</option>
+                    {% for s in subjects %}
+                        <option value="{{ s.id }}" {% if s.id|stringformat:"s" == selected_subject_id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="lecture_date">Date *</label>
+                <input type="date" id="lecture_date" name="lecture_date" value="{{ selected_date }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="timetable_id">Timetable Slot *</label>
+                <select name="timetable_id" id="timetable_id" required {% if not selected_subject_id %}disabled{% endif %}>
+                    <option value="">— Select Slot —</option>
+                    {% for slot in timetable_slots %}
+                        <option value="{{ slot.id }}" {% if slot.id|stringformat:"s" == selected_timetable_id|stringformat:"s" %}selected{% endif %}>
+                            {{ slot.day }} ({{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}) - {{ slot.faculty_subject.subject.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Load Student List</button>
+    </form>
+
+    <!-- Students List Form (if students loaded) -->
+    {% if students %}
+        <form method="post" class="attendance-form" style="margin-top: 30px;">
+            {% csrf_token %}
+            <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+            <input type="hidden" name="subject_id" value="{{ selected_subject_id }}">
+            <input type="hidden" name="lecture_date" value="{{ selected_date }}">
+            <input type="hidden" name="timetable_id" value="{{ selected_timetable_id }}">
+
+            <h3>Student Attendance</h3>
+            <p style="margin-bottom: 15px;">Check the box if the student is Present</p>
+
+            <div class="bulk-actions" style="margin-bottom: 15px; display: flex; gap: 10px;">
+                <button type="button" class="btn" onclick="selectAll()" style="padding: 6px 12px; font-size: 0.85rem; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Select All</button>
+                <button type="button" class="btn" onclick="selectNone()" style="padding: 6px 12px; font-size: 0.85rem; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Select None</button>
+            </div>
+
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th width="80px">Present</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="present_students" value="{{ s.id }}" checked>
+                            </td>
+                            <td>{{ s.full_name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="form-footer" style="margin-top: 20px;">
+                <button type="submit" class="btn-submit">Submit Attendance</button>
+            </div>
+        </form>
+    {% endif %}
+</main>
+
+<script>
+document.getElementById('class_id').addEventListener('change', function () {
+    const classId = this.value;
+    const subjectSelect = document.getElementById('subject_id');
+    const slotSelect = document.getElementById('timetable_id');
+
+    subjectSelect.innerHTML = '<option value="">— Select Subject —</option>';
+    slotSelect.innerHTML = '<option value="">— Select Slot —</option>';
+    slotSelect.disabled = true;
+
+    if (!classId) {
+        subjectSelect.disabled = true;
+        return;
+    }
+
+    subjectSelect.innerHTML = '<option value="">Loading...</option>';
+    subjectSelect.disabled = true;
+
+    fetch(`/ajax/get-subjects-by-class/?class_id=${classId}`)
+        .then(r => r.json())
+        .then(data => {
+            subjectSelect.innerHTML = '<option value="">— Select Subject —</option>';
+            data.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                subjectSelect.appendChild(opt);
+            });
+            subjectSelect.disabled = false;
+        })
+        .catch(() => {
+            subjectSelect.innerHTML = '<option value="">Error loading subjects</option>';
+        });
+});
+
+document.getElementById('subject_id').addEventListener('change', function () {
+    const classId = document.getElementById('class_id').value;
+    const subjectId = this.value;
+    const slotSelect = document.getElementById('timetable_id');
+
+    slotSelect.innerHTML = '<option value="">— Select Slot —</option>';
+
+    if (!classId || !subjectId) {
+        slotSelect.disabled = true;
+        return;
+    }
+
+    slotSelect.innerHTML = '<option value="">Loading...</option>';
+    slotSelect.disabled = true;
+
+    fetch(`/ajax/get-timetable-slots/?class_id=${classId}&subject_id=${subjectId}`)
+        .then(r => r.json())
+        .then(data => {
+            slotSelect.innerHTML = '<option value="">— Select Slot —</option>';
+            data.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = `${t.day} (${t.start_time} - ${t.end_time})`;
+                slotSelect.appendChild(opt);
+            });
+            slotSelect.disabled = false;
+        })
+        .catch(() => {
+            slotSelect.innerHTML = '<option value="">Error loading slots</option>';
+        });
+});
+
+// Prevent selecting future dates on calendar input
+const todayStr = new Date().toISOString().split('T')[0];
+const dateInput = document.getElementById('lecture_date');
+if (dateInput) {
+    dateInput.setAttribute('max', todayStr);
+}
+
+// Bulk check/uncheck helpers
+function selectAll() {
+    document.querySelectorAll('input[name="present_students"]').forEach(cb => cb.checked = true);
+}
+function selectNone() {
+    document.querySelectorAll('input[name="present_students"]').forEach(cb => cb.checked = false);
+}
+</script>
