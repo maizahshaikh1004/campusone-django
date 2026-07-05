@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}All Faculty - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">co_present</span></span>
+            <span>Faculty Directory</span>
+        </h1>
+        <div class="count-badge">{{ faculty|length }} Faculty Member{{ faculty|length|pluralize }}</div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="filters-card">
+        <form method="get" class="filters-form">
+            <div class="filter-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" name="search" class="input-field" placeholder="Search name, email, username..." value="{{ search_query }}">
+            </div>
+            
+            <div class="filter-group">
+                <label for="department">Department</label>
+                <select id="department" name="department" class="select-field">
+                    <option value="">All Departments</option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}" {% if selected_dept == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="select-field">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active Only</option>
+                    <option value="inactive" {% if selected_status == "inactive" %}selected{% endif %}>Inactive Only</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem;">Search</button>
+                <a href="?" class="btn btn-secondary" style="padding: 0.65rem 1.25rem;">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-secondary); margin-bottom: 2rem;">
+        {% if faculty %}
+            <div class="table-responsive" style="margin-bottom: 0; border: none; border-radius: 0; box-shadow: none;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in faculty %}
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar">{{ f.full_name|slice:":1"|upper }}</div>
+                                        <a href="{% url 'view_profile' f.id %}" class="user-name">{{ f.full_name }}</a>
+                                    </div>
+                                </td>
+                                <td>{{ f.user.email }}</td>
+                                <td>{% if f.department %}{{ f.department.name }}{% else %}<span class="muted">—</span>{% endif %}</td>
+                                <td>
+                                    {% if f.user.is_active %}
+                                        <span class="status-badge status-present">Active</span>
+                                    {% else %}
+                                        <span class="status-badge status-absent">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if f.user.is_active %}
+                                        <a href="{% url 'toggle_user_status' f.id %}?next={{ request.get_full_path|urlencode }}" class="btn-toggle deactivate" onclick="return confirm('Deactivate faculty member {{ f.full_name }}?');">Deactivate</a>
+                                    {% else %}
+                                        <a href="{% url 'toggle_user_status' f.id %}?next={{ request.get_full_path|urlencode }}" class="btn-toggle activate" onclick="return confirm('Activate faculty member {{ f.full_name }}?');">Activate</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><span class="material-symbols-outlined">co_present</span></div>
+                <h3 class="empty-title">No Faculty Found</h3>
+                <p class="empty-text">Try resetting the filters or broadening your search term.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

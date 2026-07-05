@@ -1,94 +1,97 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_dashboard' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Dashboard</span>
-        </a>
-        <a href="{% url 'create_notice' %}" class="create-btn">
-            ➕ Create Notice
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}My Notices - Faculty - CampusOne{% endblock %}
 
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
     <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>📢</span>
+            <span><span class="material-symbols-outlined">campaign</span></span>
             <span>My Notices</span>
         </h1>
-        {% if notices %}
-        <div class="count-badge">{{ notices|length }} Notice{{ notices|length|pluralize }}</div>
-        {% endif %}
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if notices %}
+                <div class="count-badge">{{ notices|length }} Notice{{ notices|length|pluralize }}</div>
+            {% endif %}
+            <a href="{% url 'create_notice' %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                <span><span class="material-symbols-outlined">add</span></span>
+                <span>Create Notice</span>
+            </a>
+        </div>
     </div>
 
     <!-- Notices List -->
     {% if notices %}
-    <div class="notices-list">
-        {% for n in notices %}
-        <div class="notice-card">
-            <div class="notice-header">
-                <h2 class="notice-title">{{ n.title }}</h2>
-                <div class="notice-meta">
-                    <div class="meta-item">
-                        <span>👤</span>
-                        <span>{{ n.created_by.full_name|default:n.created_by.user.username }}</span>
-                    </div>
-                    <span class="meta-divider"></span>
-                    <div class="meta-item">
-                        <span>📅</span>
-                        <span>{{ n.created_at|date:"d M Y" }}</span>
-                    </div>
-                    {% if n.department %}
-                        <span class="meta-divider"></span>
-                        <div class="meta-item">
-                            <span>🏢</span>
-                            <span>{{ n.department.name }}</span>
+        <div class="notices-list">
+            {% for n in notices %}
+                <div class="notice-card">
+                    <div class="notice-header">
+                        <div>
+                            <h2 class="notice-title">{{ n.title }}</h2>
+                            <div class="notice-meta" style="margin-top: 0.5rem;">
+                                <div class="meta-item">
+                                    <span><span class="material-symbols-outlined">person</span></span>
+                                    <span>{{ n.created_by.full_name|default:n.created_by.user.username }}</span>
+                                </div>
+                                <span class="meta-divider"></span>
+                                <div class="meta-item">
+                                    <span><span class="material-symbols-outlined">calendar_today</span></span>
+                                    <span>{{ n.created_at|date:"d M Y" }}</span>
+                                </div>
+                                {% if n.department %}
+                                    <span class="meta-divider"></span>
+                                    <div class="meta-item">
+                                        <span>🏢</span>
+                                        <span>{{ n.department.name }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if n.academic_class %}
+                                    <span class="meta-divider"></span>
+                                    <div class="meta-item">
+                                        <span><span class="material-symbols-outlined">school</span></span>
+                                        <span>{{ n.academic_class.name }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    {% endif %}
-                    {% if n.academic_class %}
-                        <span class="meta-divider"></span>
-                        <div class="meta-item">
-                            <span>🎓</span>
-                            <span>{{ n.academic_class.name }}</span>
-                        </div>
-                    {% endif %}
+                    </div>
+
+                    <div class="notice-content" style="margin-top: 1rem; color: var(--text-secondary);">
+                        {{ n.content }}
+                    </div>
+
+                    <div class="notice-footer" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        {% if n.attachment %}
+                            <a href="{{ n.attachment.url }}" target="_blank" class="attachment-btn">
+                                <span><span class="material-symbols-outlined">attachment</span></span>
+                                <span>Download Attachment</span>
+                            </a>
+                        {% else %}
+                            <span class="no-attachment">No attachment</span>
+                        {% endif %}
+
+                        {% if n.created_by.user == request.user or request.user.profile.role == 'ADMIN' %}
+                            <div>
+                                <a href="{% url 'edit_notice' n.id %}" class="btn-edit"><span class="material-symbols-outlined">edit</span> Edit</a>
+                                <a href="{% url 'delete_notice' n.id %}" class="btn-delete" onclick="return confirm('Delete this notice?');"><span class="material-symbols-outlined">delete</span> Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-
-            <div class="notice-content">
-                {{ n.content }}
-            </div>
-
-            <div class="notice-footer">
-                {% if n.attachment %}
-                    <a href="{{ n.attachment.url }}" target="_blank" class="attachment-btn">
-                        <span>📎</span>
-                        <span>Download Attachment</span>
-                    </a>
-                {% endif %}
-
-                {% if n.created_by.user == request.user or request.user.profile.role == 'ADMIN' %}
-                    <a href="{% url 'edit_notice' n.id %}" class="btn-edit">✏️ Edit</a>
-                    <a href="{% url 'delete_notice' n.id %}" class="btn-delete" onclick="return confirm('Delete this notice?');">🗑️ Delete</a>
-                {% endif %}
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
     {% else %}
-    <!-- Empty State -->
-    <div class="empty-state">
-        <div class="empty-icon">📢</div>
-        <div class="empty-title">No Notices Yet</div>
-        <div class="empty-text">Click "Create Notice" to post your first notice.</div>
-    </div>
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">campaign</span></div>
+            <h3 class="empty-title">No Notices Yet</h3>
+            <p class="empty-text">Click "Create Notice" to post your first notice.</p>
+        </div>
     {% endif %}
-
-</main>
+{% endblock %}

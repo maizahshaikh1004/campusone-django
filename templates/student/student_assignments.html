@@ -1,108 +1,158 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_dashboard' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
+{% block title %}My Assignments - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">book</span></span>
+            <span>My Assignments</span>
+        </h1>
+        <div class="count-badge" id="countBadge">{{ assignment_data|length }} Total</div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel">
+        <div class="filter-label">Filter by Status</div>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="open">Open</button>
+            <button class="filter-tab" data-filter="late">Late</button>
+            <button class="filter-tab" data-filter="submitted">Submitted</button>
         </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📘</span>
-                <span>My Assignments</span>
-            </h1>
-            <div class="count-badge" id="countBadge">{{ assignment_data|length }} Total</div>
-        </div>
-    
-        <!-- Filter Panel -->
-        <div class="filter-panel">
-            <div class="filter-label">Filter by Status</div>
-            <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="open">Open</button>
-                <button class="filter-tab" data-filter="late">Late</button>
-                <button class="filter-tab" data-filter="submitted">Submitted</button>
+    </div>
+
+    <!-- Assignments Grid -->
+    <div class="assignments-grid">
+        {% for a in assignment_data %}
+        <div class="assignment-card {% if a.is_submitted %}submitted{% elif a.assignment.due_date < today %}late{% else %}open{% endif %}"
+             data-status="{% if a.is_submitted %}submitted{% elif a.assignment.due_date < today %}late{% else %}open{% endif %}">
+            
+            <div class="card-header" style="width: 100%;">
+                <div class="assignment-info">
+                    <div class="assignment-title">{{ a.assignment.title }}</div>
+                    <div class="assignment-meta">
+                        <span>{{ a.assignment.faculty_subject.subject.name }}</span>
+                        <span class="meta-divider"></span>
+                        <span>{{ a.assignment.faculty_subject.faculty.full_name }}</span>
+                    </div>
+                </div>
+
+                {% if a.is_submitted %}
+                    <span class="status-badge badge-submitted"><span class="material-symbols-outlined">check_circle</span> Submitted</span>
+                {% elif a.assignment.due_date < today %}
+                    <span class="status-badge badge-late"><span class="material-symbols-outlined">schedule</span> Late</span>
+                {% else %}
+                    <span class="status-badge badge-open"><span class="material-symbols-outlined">description</span> Open</span>
+                {% endif %}
             </div>
-        </div>
-    
-        <!-- Assignments Grid -->
-        <div class="assignments-grid">
-            {% for a in assignment_data %}
-            <div class="assignment-card {% if a.is_submitted %}submitted{% elif a.assignment.due_date < today %}late{% else %}open{% endif %}"
-                 data-status="{% if a.is_submitted %}submitted{% elif a.assignment.due_date < today %}late{% else %}open{% endif %}">
-                
-                <div class="card-header">
-                    <div class="assignment-info">
-                        <div class="assignment-title">{{ a.assignment.title }}</div>
-                        <div class="assignment-meta">
-                            <span>{{ a.assignment.faculty_subject.subject.name }}</span>
-                            <span class="meta-divider"></span>
-                            <span>{{ a.assignment.faculty_subject.faculty.full_name }}</span>
-                        </div>
-                    </div>
-    
-                    {% if a.is_submitted %}
-                        <span class="status-badge badge-submitted">✓ Submitted</span>
-                    {% elif a.assignment.due_date < today %}
-                        <span class="status-badge badge-late">⏰ Late</span>
-                    {% else %}
-                        <span class="status-badge badge-open">📝 Open</span>
-                    {% endif %}
+
+            <p class="assignment-description" style="margin-top: 1rem; margin-bottom: 1rem;">{{ a.assignment.description }}</p>
+
+            <div class="deadline-section" style="margin-bottom: 1.25rem;">
+                <div class="deadline-info">
+                    <div class="deadline-label">Due Date</div>
+                    <div class="deadline-date"><span class="material-symbols-outlined">calendar_today</span> {{ a.assignment.due_date }}</div>
                 </div>
-    
-                <p class="assignment-description">{{ a.assignment.description }}</p>
-    
-                <div class="deadline-section">
-                    <div class="deadline-info">
-                        <div class="deadline-label">Due Date</div>
-                        <div class="deadline-date">📅 {{ a.assignment.due_date }}</div>
-                    </div>
-                    {% if not a.is_submitted %}
-                    <div class="countdown" data-due="{{ a.assignment.due_date|date:'Y-m-d' }}">
-                        Calculating…
-                    </div>
-                    {% else %}
-                    <div class="countdown">
-                        <span>✓</span>
-                        <span>Completed</span>
-                    </div>
-                    {% endif %}
+                {% if not a.is_submitted %}
+                <div class="countdown" data-due="{{ a.assignment.due_date|date:'Y-m-d' }}">
+                    Calculating…
                 </div>
-    
-                <div class="assignment-actions">
-                    {% if not a.is_submitted %}
-                        <a href="{% url 'submit_assignment' a.assignment.id %}" class="btn btn-submit">
-                            <span>📤</span>
-                            <span>Submit Assignment</span>
-                        </a>
-                    {% else %}
-                        <div class="submitted-text">
-                            <span>✓</span>
-                            <span>Submission Received</span>
-                        </div>
-                    {% endif %}
-    
-                    {% if a.assignment.question_file %}
-                        <a href="{{ a.assignment.question_file.url }}" target="_blank" class="btn btn-secondary">
-                            <span>📎</span>
-                            <span>Question Paper</span>
-                        </a>
-                    {% endif %}
+                {% else %}
+                <div class="countdown">
+                    <span><span class="material-symbols-outlined">check_circle</span></span>
+                    <span>Completed</span>
                 </div>
-    
+                {% endif %}
             </div>
-            {% endfor %}
+
+            <div class="assignment-actions">
+                {% if not a.is_submitted %}
+                    <a href="{% url 'submit_assignment' a.assignment.id %}" class="btn btn-submit">
+                        <span><span class="material-symbols-outlined">upload</span></span>
+                        <span>Submit Assignment</span>
+                    </a>
+                {% else %}
+                    <div class="submitted-text">
+                        <span><span class="material-symbols-outlined">check_circle</span></span>
+                        <span>Submission Received</span>
+                    </div>
+                {% endif %}
+
+                {% if a.assignment.question_file %}
+                    <a href="{{ a.assignment.question_file.url }}" target="_blank" class="btn btn-secondary">
+                        <span><span class="material-symbols-outlined">attachment</span></span>
+                        <span>Question Paper</span>
+                    </a>
+                {% endif %}
+            </div>
+
         </div>
-    
-    </main>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">book</span></div>
+            <div class="empty-title">No Assignments</div>
+            <div class="empty-text">No assignments have been posted for your class yet.</div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Filter functionality
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const assignments = document.querySelectorAll('.assignment-card');
+    const countBadge = document.getElementById('countBadge');
+    const totalAssignments = assignments.length;
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const filter = tab.dataset.filter;
+            let visibleCount = 0;
+
+            assignments.forEach(card => {
+                const status = card.dataset.status;
+                const isVisible = filter === 'all' || status === filter;
+                card.style.display = isVisible ? 'flex' : 'none';
+                if (isVisible) visibleCount++;
+            });
+
+            if (visibleCount === totalAssignments) {
+                countBadge.textContent = `${totalAssignments} Total`;
+            } else {
+                countBadge.textContent = `${visibleCount} of ${totalAssignments}`;
+            }
+        });
+    });
+
+    // Countdown timer
+    document.querySelectorAll('.countdown[data-due]').forEach(el => {
+        const dueStr = el.dataset.due;
+        const dueDate = new Date(dueStr + 'T23:59:59');
+        const now = new Date();
+        const diff = dueDate - now;
+
+        if (diff <= 0) {
+            el.innerHTML = '<span>❌</span><span>Deadline passed</span>';
+            el.classList.add('urgent');
+        } else {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (days === 0 && hours <= 24) {
+                el.innerHTML = `<span>⚠️</span><span>${hours} hour(s) left</span>`;
+                el.classList.add('urgent');
+            } else {
+                el.innerHTML = `<span><span class="material-symbols-outlined">pending_actions</span></span><span>${days} day(s) ${hours} hr(s) left</span>`;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

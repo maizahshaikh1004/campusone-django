@@ -16,6 +16,9 @@ urlpatterns = [
     path('admin/timetable/', views.admin_timetable, name='admin_timetable'),
     path('admin/attendance-report/', views.admin_attendance_report, name='admin_attendance_report'),
     path('admin/corrections/', views.attendance_corrections_admin, name='attendance_corrections_admin'),
+    path('admin/corrections/approve/<int:request_id>/', views.approve_attendance_correction_view, name='approve_attendance_correction'),
+    path('admin/corrections/reject/<int:request_id>/', views.reject_attendance_correction_view, name='reject_attendance_correction'),
+    path('admin/users/toggle/<int:profile_id>/', views.toggle_user_status_view, name='toggle_user_status'),
     path("",include("users.urls")),
     
     # Global AJAX paths used in templates

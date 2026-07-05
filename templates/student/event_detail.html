@@ -1,142 +1,155 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="
-            {% if request.user.profile.role == 'ADMIN' %}{% url 'admin_dashboard' %}
-            {% elif request.user.profile.role == 'FACULTY' %}{% url 'faculty_dashboard' %}
-            {% else %}{% url 'student_dashboard' %}{% endif %}
-            " class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <div class="container">
-    
-        <!-- Hero Poster -->
-        <div class="poster-hero">
-            {% if event.poster %}
-                <img src="{{event.poster.url}}" alt="{{ event.title }}">
-            {% else %}
-                <div class="poster-fallback">🎉</div>
+{% block title %}{{ event.title }} - Event Details - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="
+{% if request.user.profile.role == 'ADMIN' %}{% url 'admin_dashboard' %}
+{% elif request.user.profile.role == 'FACULTY' %}{% url 'faculty_dashboard' %}
+{% else %}{% url 'student_dashboard' %}{% endif %}
+" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Poster -->
+    <div class="poster-hero">
+        {% if event.poster %}
+            <img src="{{ event.poster.url }}" alt="{{ event.title }}">
+        {% else %}
+            <div class="poster-fallback"><span class="material-symbols-outlined">celebration</span></div>
+        {% endif %}
+
+        <div class="event-hero-info">
+            <h1 class="event-title">{{ event.title }}</h1>
+            <div class="event-tags">
+                <span class="tag tag-date"><span class="material-symbols-outlined">calendar_today</span> {{ event.event_date|date:"d M Y" }}</span>
+                <span class="tag tag-venue"><span class="material-symbols-outlined">location_on</span> {{ event.venue }}</span>
+                <span class="tag tag-faculty"><span class="material-symbols-outlined">person</span> {{ event.faculty_incharge.full_name }}</span>
+            </div>
+            {% if event.description %}
+                <p class="event-desc">{{ event.description }}</p>
             {% endif %}
-    
-            <div class="event-hero-info">
-                <h1 class="event-title">{{ event.title }}</h1>
-                <div class="event-tags">
-                    <span class="tag tag-date">📅 {{ event.event_date|date:"d M Y" }}</span>
-                    <span class="tag tag-venue">📍 {{ event.venue }}</span>
-                    <span class="tag tag-faculty">👤 {{ event.faculty_incharge.full_name }}</span>
-                </div>
-                {% if event.description %}
-                    <p class="event-desc">{{ event.description }}</p>
-                {% endif %}
-            </div>
-        </div>
-    
-        <!-- Content Grid -->
-        <div class="content-grid">
-    
-            <!-- Left: Event Details -->
-            <div>
-                <div class="card">
-                    <div class="card-title">
-                        <span>📋</span>
-                        <span>Event Details</span>
-                    </div>
-                    <div class="meta-list">
-                        <div class="meta-item">
-                            <div class="meta-icon">📅</div>
-                            <div class="meta-content">
-                                <div class="meta-label">Date</div>
-                                <div class="meta-value">{{ event.event_date|date:"d M Y" }}</div>
-                            </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-icon">⏰</div>
-                            <div class="meta-content">
-                                <div class="meta-label">Time</div>
-                                <div class="meta-value">{{ event.start_time }} – {{ event.end_time }}</div>
-                            </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-icon">📍</div>
-                            <div class="meta-content">
-                                <div class="meta-label">Venue</div>
-                                <div class="meta-value">{{ event.venue }}</div>
-                            </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-icon">👤</div>
-                            <div class="meta-content">
-                                <div class="meta-label">Faculty In-charge</div>
-                                <div class="meta-value">{{ event.faculty_incharge.full_name }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Share Card -->
-                <div class="card">
-                    <div class="card-title">
-                        <span>📢</span>
-                        <span>Share Event</span>
-                    </div>
-                    <textarea class="share-textarea" id="shareText" rows="7" readonly>📢 EVENT ALERT
-    
-    🎯 {{ event.title }}
-    📍 {{ event.venue }}
-    🗓 {{ event.event_date|date:"d M Y" }}
-    ⏰ {{ event.start_time }} – {{ event.end_time }}
-    
-    📝 Register here:
-    {{ event.google_form_link }}</textarea>
-    
-                    <div class="share-actions">
-                        <button class="btn-copy" id="copyBtn" onclick="copyText()">
-                            <span>📋</span>
-                            <span>Copy Message</span>
-                        </button>
-                        <a class="btn-whatsapp"
-                           href="https://wa.me/?text={{ event.title|urlencode }}%0A📍{{ event.venue|urlencode }}%0A🗓{{ event.event_date|urlencode }}%0A{{ event.google_form_link|urlencode }}"
-                           target="_blank">
-                            <span>💬</span>
-                            <span>WhatsApp</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Right Sidebar: Registration -->
-            <div>
-                {% if event.google_form_link %}
-                <div class="card">
-                    <div class="card-title">
-                        <span>📝</span>
-                        <span>Register</span>
-                    </div>
-                    <div class="qr-wrapper">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ event.google_form_link}}" alt="QR Code">
-                        <p class="qr-label">Scan the QR code or click the button below to register</p>
-                    </div>
-                    <a href="{{ event.google_form_link}}" target="_blank" class="btn-register">
-                        👉 Register Now
-                    </a>
-                    <div class="registration-link">
-                        <strong>Registration Link</strong>
-                        <br>
-                        {{event.google_form_link}}
-                    </div>
-                    
-                </div>
-                {% endif %}
-            </div>
-    
         </div>
     </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+
+        <!-- Left: Event Details & Sharing -->
+        <div>
+            <div class="card">
+                <div class="card-title">
+                    <span>📋</span>
+                    <span>Event Details</span>
+                </div>
+                <div class="meta-list">
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+                        <div class="meta-content">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">{{ event.event_date|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">schedule</span></div>
+                        <div class="meta-content">
+                            <div class="meta-label">Time</div>
+                            <div class="meta-value">{{ event.start_time }} – {{ event.end_time }}</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">location_on</span></div>
+                        <div class="meta-content">
+                            <div class="meta-label">Venue</div>
+                            <div class="meta-value">{{ event.venue }}</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">person</span></div>
+                        <div class="meta-content">
+                            <div class="meta-label">Faculty In-charge</div>
+                            <div class="meta-value">{{ event.faculty_incharge.full_name }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span><span class="material-symbols-outlined">campaign</span></span>
+                    <span>Share Event</span>
+                </div>
+                <textarea class="share-textarea" id="shareText" rows="7" readonly><span class="material-symbols-outlined">campaign</span> EVENT ALERT
+
+<span class="material-symbols-outlined">track_changes</span> {{ event.title }}
+<span class="material-symbols-outlined">location_on</span> {{ event.venue }}
+🗓 {{ event.event_date|date:"d M Y" }}
+<span class="material-symbols-outlined">schedule</span> {{ event.start_time }} – {{ event.end_time }}
+
+<span class="material-symbols-outlined">description</span> Register here:
+{{ event.google_form_link }}</textarea>
+
+                <div class="share-actions">
+                    <button class="btn btn-secondary" id="copyBtn" onclick="copyText()" style="flex: 1;">
+                        <span>📋</span>
+                        <span>Copy Message</span>
+                    </button>
+                    <a class="btn" style="background-color: #25d366; color: white; flex: 1;"
+                       href="https://wa.me/?text={{ event.title|urlencode }}%0A<span class="material-symbols-outlined">location_on</span>{{ event.venue|urlencode }}%0A🗓{{ event.event_date|date:'d M Y'|urlencode }}%0A{{ event.google_form_link|urlencode }}"
+                       target="_blank">
+                        <span><span class="material-symbols-outlined">chat</span></span>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Registration -->
+        <div>
+            {% if event.google_form_link %}
+            <div class="card">
+                <div class="card-title">
+                    <span><span class="material-symbols-outlined">description</span></span>
+                    <span>Register</span>
+                </div>
+                <div class="qr-wrapper">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ event.google_form_link|urlencode }}" alt="QR Code">
+                    <p class="qr-label">Scan the QR code or click the button below to register</p>
+                </div>
+                <a href="{{ event.google_form_link }}" target="_blank" class="btn btn-primary btn-block" style="background-color: var(--success); margin-bottom: 1.5rem;">
+                    👉 Register Now
+                </a>
+                <div class="registration-link">
+                    <strong style="font-size: 0.85rem;">Registration Link</strong>
+                    <br>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">{{ event.google_form_link }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyText() {
+    var copyText = document.getElementById("shareText");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    
+    // Alert replacement with dynamic temporary feedback
+    var copyBtn = document.getElementById("copyBtn");
+    var originalHTML = copyBtn.innerHTML;
+    copyBtn.innerHTML = "<span>Check</span><span>Copied!</span>";
+    setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+    }, 2000);
+}
+</script>
+{% endblock %}

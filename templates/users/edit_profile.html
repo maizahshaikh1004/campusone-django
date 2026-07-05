@@ -1,65 +1,67 @@
+{% extends 'base.html' %}
 
-<body>
+{% block title %}Edit Profile - CampusOne{% endblock %}
 
-    <div class="container">
-    
-        <div class="header">
-            <h2>✏ Edit Profile</h2>
-            <a href="{% url 'profile' %}" class="back">← Back</a>
-        </div>
-    
-        <div class="card">
-    
-            <!-- 🔔 Messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <p class="{{ message.tags }}"><b>{{ message }}</b></p>
-                {% endfor %}
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">edit</span></span>
+            <span>Edit Profile</span>
+        </h1>
+        <a href="{% url 'profile' %}" class="back-link">← Back to Profile</a>
+    </div>
+
+    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- Profile Photo Preview -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+            {% if profile and profile.profile_photo %}
+                <img src="/media/{{ profile.profile_photo.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent);" alt="Avatar">
+            {% else %}
+                <div style="width: 100px; height: 100px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; color: var(--text-secondary);">
+                    {{ profile.full_name|slice:":1"|upper }}
+                </div>
             {% endif %}
-    
-            <!-- 📸 PROFILE PHOTO -->
-            <div class="photo-wrap">
-                {% if profile and profile.profile_photo %}
-                    <img src="/media/{{ profile.profile_photo.url }}" class="avatar">
-                {% else %}
-                    <img src="https://via.placeholder.com/130?text=No+Photo" class="avatar">
-                {% endif %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="profile_photo">Profile Photo</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
             </div>
-    
-            <!-- FORM -->
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-    
-                <label>Profile Photo</label>
-                <input type="file" name="profile_photo" accept="image/*">
-    
-                <label>Phone Number</label>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
                 <input type="tel"
+                       id="phone"
                        name="phone"
-                       value="{{ profile.phone}}"
+                       value="{{ profile.phone }}"
                        pattern="[0-9]{10}"
                        maxlength="10"
                        minlength="10"
                        inputmode="numeric"
                        placeholder="Enter 10 digit phone number"
                        required>
-    
-                <label>Address</label>
-                <textarea name="address" rows="3">{{ profile.address|default:'' }}</textarea>
-    
-                <label>Bio</label>
-                <textarea name="bio" rows="4">{{ profile.bio|default:'' }}</textarea>
-    
-                <div class="actions">
-                    <button type="submit" class="save">💾 Save Profile</button>
-                    <a href="{% url 'profile' %}" class="cancel">Cancel</a>
-                </div>
-            </form>
-    
-        </div>
-    
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="3" placeholder="Enter physical address">{{ profile.address|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" rows="4" placeholder="Write a short bio...">{{ profile.bio|default:'' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;"><span class="material-symbols-outlined">save</span> Save Changes</button>
+                <a href="{% url 'profile' %}" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+
     </div>
-    
-    </body>
-    </html>
-    
+{% endblock %}

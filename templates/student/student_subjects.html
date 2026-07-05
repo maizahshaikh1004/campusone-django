@@ -1,59 +1,46 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_dashboard' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📚</span>
-                <span>My Subjects</span>
-            </h1>
-            <p>All subjects you're enrolled in this semester</p>
-        </div>
-    
+{% block title %}My Subjects - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">menu_book</span></span>
+            <span>My Subjects</span>
+        </h1>
         {% if subjects %}
-        <!-- Count Badge -->
         <div class="count-badge">
             {{ subjects|length }} Subject{{ subjects|length|pluralize }}
         </div>
-    
-        <!-- Subjects Grid -->
-        <div class="subjects-grid">
-            {% for s in subjects %}
-            <div class="subject-card">
-                <div class="subject-icon">📖</div>
-                
-                <div class="subject-header">
-                    <div class="subject-info">
-                        <div class="subject-name">{{ s.name }}</div>
-                        
-                    </div>
-                    <span class="subject-badge">Active</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    
-        {% else %}
-        <!-- Empty State -->
-        <div class="empty-state">
-            <div class="empty-icon">📚</div>
-            <div class="empty-text">No subjects enrolled yet</div>
-        </div>
         {% endif %}
+    </div>
     
-    </main>
+    <p style="margin-top: -1.5rem; margin-bottom: 2rem; color: var(--text-secondary);">All subjects you're enrolled in this semester</p>
+
+    {% if subjects %}
+    <!-- Subjects Grid -->
+    <div class="subjects-grid">
+        {% for s in subjects %}
+        <div class="card" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0;">
+            <div class="subject-icon">📖</div>
+            
+            <div class="subject-header" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div class="subject-info">
+                    <div class="subject-name" style="font-size: 1.15rem; font-weight: 700;">{{ s.name }}</div>
+                </div>
+                <span class="subject-badge">Active</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon"><span class="material-symbols-outlined">menu_book</span></div>
+        <div class="empty-title">No Subjects</div>
+        <div class="empty-text">You are not enrolled in any academic subjects yet.</div>
+    </div>
+    {% endif %}
+{% endblock %}

@@ -1,82 +1,72 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_coordinator_events' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Current Events</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📜</span>
-                <span>Past Coordinated Events</span>
-            </h1>
-            {% if past_events %}
-            <div class="count-badge">{{ past_events|length }} Completed</div>
-            {% endif %}
-        </div>
-    
-        <!-- Events Grid -->
+{% block title %}Past Coordinated Events - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span>📜</span>
+            <span>Past Coordinated Events</span>
+        </h1>
         {% if past_events %}
-        <div class="events-grid">
-            {% for e in past_events %}
-            <div class="event-card">
-                
-                <!-- Poster -->
-                <div class="event-poster">
-                    {% if e.past_events.poster %}
-                        <img src="/media/{{ e.past_events.poster.url }}" alt="{{ e.past_events.title }}">
-                    {% else %}
-                        <img src="https://via.placeholder.com/200x250/6366f1/ffffff?text=Event+Poster" alt="Event Poster">
-                    {% endif %}
-                    <div class="completed-badge">
-                        <span>✓</span>
-                        <span>Completed</span>
-                    </div>
-                </div>
-    
-                <!-- Content -->
-                <div class="event-content">
-                    <h2 class="event-title">{{ e.past_events.title }}</h2>
-    
-                    <div class="event-meta">
-                        <div class="meta-item">
-                            <div class="meta-icon">📅</div>
-                            <span>{{ e.past_events.event_date }}</span>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-icon">⏰</div>
-                            <span>{{ e.past_events.start_time }} – {{ e.past_events.end_time }}</span>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-icon">📍</div>
-                            <span>{{ e.past_events.venue }}</span>
-                        </div>
-                    </div>
-                </div>
-    
-            </div>
-            {% endfor %}
-        </div>
-    
-        {% else %}
-        <!-- Empty State -->
-        <div class="empty-state">
-            <div class="empty-icon">📜</div>
-            <div class="empty-title">No Past Events</div>
-            <div class="empty-text">You have no past coordinated events</div>
-        </div>
+        <div class="count-badge">{{ past_events|length }} Completed</div>
         {% endif %}
-    
-    </main>
+    </div>
+
+    <!-- Events Grid -->
+    {% if past_events %}
+    <div class="events-grid">
+        {% for e in past_events %}
+        <div class="event-card">
+            <!-- Poster -->
+            <div class="event-poster">
+                {% if e.event.poster %}
+                    <img src="{{ e.event.poster.url }}" alt="{{ e.event.event_title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/200x250/6366f1/ffffff?text=Event+Poster" alt="Event Poster">
+                {% endif %}
+                <div class="completed-badge">
+                    <span><span class="material-symbols-outlined">check_circle</span></span>
+                    <span>Completed</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="event-content">
+                <h2 class="event-title">{{ e.event.event_title }}</h2>
+
+                <div class="event-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+                        <span>{{ e.event.event_date|date:"d M Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">schedule</span></div>
+                        <span>{{ e.event.start_time }} – {{ e.event.end_time }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><span class="material-symbols-outlined">location_on</span></div>
+                        <span>{{ e.event.venue }}</span>
+                    </div>
+                </div>
+                
+                <div class="event-actions">
+                    <a href="{% url 'event_detail' e.event.id %}" class="btn btn-view" style="width: 100%;">
+                        <span><span class="material-symbols-outlined">visibility</span></span>
+                        <span>View Details</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">📜</div>
+        <div class="empty-title">No Past Events</div>
+        <div class="empty-text">You have no completed coordinated events.</div>
+    </div>
+    {% endif %}
+{% endblock %}

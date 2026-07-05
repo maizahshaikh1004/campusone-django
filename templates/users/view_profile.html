@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile Details - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="
+{% if profile.role == 'STUDENT' %}
+    {% url 'admin_students_list' %}
+{% else %}
+    {% url 'admin_all_faculty' %}
+{% endif %}
+" class="back-link">
+    <span>←</span>
+    <span>Back to Directory</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">person</span></span>
+            <span>User Profile Details</span>
+        </h1>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        
+        <!-- Header -->
+        <div class="profile-header">
+            <div class="avatar-container">
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" class="avatar" alt="Profile Photo">
+                {% else %}
+                    <div class="no-avatar">{{ profile.full_name|slice:":1"|upper }}</div>
+                {% endif %}
+            </div>
+            <div class="profile-identity">
+                <h2 style="color: white;">{{ profile.full_name }}</h2>
+                <span class="profile-role">{{ profile.role }}</span>
+                <div class="profile-email">{{ profile.user.email }}</div>
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div class="info-section">
+            <h3 class="section-title">
+                <span>📋</span>
+                <span>Profile Information</span>
+            </h3>
+
+            <div class="info-grid">
+                {% if profile.department %}
+                <div class="info-item">
+                    <span class="info-label">Department</span>
+                    <span class="info-value">{{ profile.department.name }}</span>
+                </div>
+                {% endif %}
+
+                {% if profile.academic_class %}
+                <div class="info-item">
+                    <span class="info-label">Class</span>
+                    <span class="info-value">{{ profile.academic_class.name }}</span>
+                </div>
+                {% endif %}
+
+                {% if profile.academic_class.semester %}
+                <div class="info-item">
+                    <span class="info-label">Semester</span>
+                    <span class="info-value">{{ profile.academic_class.semester }}</span>
+                </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <span class="info-label">Username</span>
+                    <span class="info-value">{{ profile.user.username }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value {% if not profile.phone %}empty{% endif %}">{{ profile.phone|default:"Not Provided" }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Address</span>
+                    <span class="info-value {% if not profile.address %}empty{% endif %}">{{ profile.address|default:"Not Provided" }}</span>
+                </div>
+
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <span class="info-label">Bio</span>
+                    <span class="info-value {% if not profile.bio %}empty{% endif %}">{{ profile.bio|default:"No bio provided." }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-bar" style="background-color: var(--bg-primary); padding: 1.5rem 2rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <div class="status-info" style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="status-dot {% if profile.user.is_active %}active{% else %}inactive{% endif %}" style="width: 10px; height: 10px; border-radius: 50%; {% if profile.user.is_active %}background: #10b981; box-shadow: 0 0 8px #10b981;{% else %}background: #ef4444; box-shadow: 0 0 8px #ef4444;{% endif %}"></div>
+                <span class="status-text" style="font-weight: 600; {% if profile.user.is_active %}color: #10b981;{% else %}color: #ef4444;{% endif %}">
+                    {% if profile.user.is_active %}User Account Active{% else %}User Account Inactive{% endif %}
+                </span>
+            </div>
+
+            {% if profile.user.is_active %}
+                <a href="{% url 'toggle_user_status' profile.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-secondary" style="color: #ef4444; border-color: #fecaca; background-color: var(--error-bg);" onclick="return confirm('Deactivate account for {{ profile.full_name }}?');">Deactivate Account</a>
+            {% else %}
+                <a href="{% url 'toggle_user_status' profile.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary" style="background-color: var(--success); color: white;" onclick="return confirm('Activate account for {{ profile.full_name }}?');">Activate Account</a>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

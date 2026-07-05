@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Correction Requests - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">construction</span></span>
+            <span>Correction Requests</span>
+        </h1>
+        {% if requests %}
+            <div class="count-badge">
+                <span><span class="material-symbols-outlined">pending_actions</span></span>
+                <span>{{ requests|length }} Pending</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Cards Grid -->
+    {% if requests %}
+        <div class="cards-grid" style="margin-bottom: 2rem;">
+            {% for r in requests %}
+                <div class="request-card">
+                    <div class="card-strip"></div>
+                    <div class="card-body">
+                        <!-- Header: Faculty + Requested Status -->
+                        <div class="card-header" style="border: none; padding-bottom: 0;">
+                            <div class="faculty-info">
+                                <div class="faculty-avatar">{{ r.faculty.full_name|slice:":1"|upper }}</div>
+                                <div>
+                                    <div class="faculty-name">{{ r.faculty.full_name }}</div>
+                                    <div class="faculty-label">Faculty Member</div>
+                                </div>
+                            </div>
+                            {% if r.requested_is_present %}
+                                <span class="status-badge status-present"><span class="material-symbols-outlined">check_circle</span> Present</span>
+                            {% else %}
+                                <span class="status-badge status-absent"><span class="material-symbols-outlined">cancel</span> Absent</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Meta Info Grid -->
+                        <div class="meta-grid">
+                            <div class="meta-item">
+                                <span class="meta-label">Student</span>
+                                <span class="meta-value">{{ r.attendance_record.student.full_name }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Subject</span>
+                                <span class="meta-value">{{ r.attendance_record.attendance_session.timetable.faculty_subject.subject.name }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Lecture Date</span>
+                                <span class="meta-value">{{ r.attendance_record.attendance_session.lecture_date|date:"d M Y" }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Requested On</span>
+                                <span class="meta-value">{{ r.requested_at|date:"d M Y, H:i" }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="reason-box">
+                            <div class="reason-label"><span class="material-symbols-outlined">description</span> Faculty Reason</div>
+                            <div class="reason-text">{{ r.reason }}</div>
+                        </div>
+
+                        <!-- Card Actions -->
+                        <div class="card-actions" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.75rem;">
+                            <form method="post" action="{% url 'approve_attendance_correction' r.id %}" style="display:contents;" onsubmit="return confirm('Approve correction request for {{ r.attendance_record.student.full_name }}?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.85rem;"><span class="material-symbols-outlined">check_circle</span> Approve</button>
+                            </form>
+                            <a href="{% url 'reject_attendance_correction' r.id %}" class="btn btn-secondary" style="flex: 1; text-align: center; padding: 0.6rem 1rem; font-size: 0.85rem; background-color: var(--error-bg); color: var(--error); border-color: var(--error-border);"><span class="material-symbols-outlined">close</span> Reject</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">celebration</span></div>
+            <h3 class="empty-title">All caught up!</h3>
+            <p class="empty-text">No pending attendance correction requests.</p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,17 +1,44 @@
-<h1>CampusOne Login</h1>
+{% extends 'base.html' %}
 
-{% if error %}
-<p>{{ error }}</p>
-{% endif %}
+{% block title %}Login - CampusOne{% endblock %}
 
-<form method="post">
+{% block content %}
+<div class="auth-wrapper" style="min-height: calc(100vh - 120px);">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Sign In</h1>
+            <p>Access your CampusOne portal</p>
+        </div>
 
-    {% csrf_token %}
+        {% if error %}
+            <div class="message-toast error">
+                <span>⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
 
-    {{ form.as_p }}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="message-toast {{ message.tags }}">
+                <span><span class="material-symbols-outlined">info</span></span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
 
-    <button type="submit">
-        Login
-    </button>
+        <form method="post">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
 
-</form>
+            <button type="submit" class="btn btn-primary btn-block">
+                Login
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{% url 'register_request' %}">Request Registration</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

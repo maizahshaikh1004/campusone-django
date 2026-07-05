@@ -1,136 +1,154 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_notices' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Notices</span>
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}Create Notice - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="
+{% if request.user.profile.role == 'ADMIN' %}
+    {% url 'admin_notices' %}
+{% else %}
+    {% url 'faculty_notices' %}
+{% endif %}
+" class="back-link">
+    <span>←</span>
+    <span>Back to Notices</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>📢</span>
+            <span><span class="material-symbols-outlined">campaign</span></span>
             <span>Create Notice</span>
         </h1>
         <p>Post an announcement to your students or department</p>
     </div>
 
-    {% if messages %}
-        {% for message in messages %}
-        <div class="message-toast {{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    {% endif %}
+    <!-- Form Card -->
+    <div class="card" style="padding: 2.5rem; max-width: 800px; margin: 0 auto;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-    <form method="post" enctype="multipart/form-data" class="notice-form">
-        {% csrf_token %}
-
-        <div class="form-group">
-            <label for="title">Title *</label>
-            <input type="text" id="title" name="title" placeholder="Enter notice title..." required>
-        </div>
-
-        <div class="form-group">
-            <label for="content">Content *</label>
-            <textarea id="content" name="content" placeholder="Write your notice here..." required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="attachmentInput">Attachment (optional)</label>
-            <input type="file" name="attachment" id="attachmentInput">
-        </div>
-
-        <div class="form-group">
-            <label>Scope *</label>
-            <div class="scope-options">
-                <label>
-                    <input type="radio" name="scope" id="scope_global" value="GLOBAL" checked onchange="handleScopeChange()">
-                    <span>🌐 Global</span>
-                </label>
-                <label>
-                    <input type="radio" name="scope" id="scope_dept" value="DEPARTMENT" onchange="handleScopeChange()">
-                    <span>🏢 Department / Semester</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="scope-target" id="scopeTarget" style="display: none;">
             <div class="form-group">
-                <label for="department">Department</label>
-                <select name="department_id" id="department">
-                    <option value="">— Select Department —</option>
-                    {% for d_id, d_name in departments %}
-                    <option value="{{ d_id }}">{{ d_name }}</option>
-                    {% endfor %}
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" placeholder="Enter notice title..." value="{{ form_data.title }}" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="content">Content *</label>
+                <textarea id="content" name="content" placeholder="Write notice details here..." rows="6" required>{{ form_data.content }}</textarea>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="scope">Target Scope *</label>
+                <select name="scope" id="scope" required>
+                    <option value="GLOBAL" {% if form_data.scope == 'GLOBAL' %}selected{% endif %}>Global (All Students & Faculty)</option>
+                    <option value="DEPARTMENT" {% if form_data.scope == 'DEPARTMENT' %}selected{% endif %}>Departmental / Class Scoped</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="semester">Semester (optional)</label>
-                <select name="semester_id" id="semester" disabled>
-                    <option value="">— Select Department first —</option>
-                </select>
+            <div id="scopeDetails" class="form-row" style="display: none; margin-top: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="department">Department</label>
+                    <select name="department_id" id="department">
+                        <option value="">— Select Department —</option>
+                        {% for d_id, d_name in departments %}
+                            <option value="{{ d_id }}" {% if form_data.department_id == d_id|stringformat:"s" %}selected{% endif %}>{{ d_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="semester">Semester (Optional - for Class scope)</label>
+                    <select name="semester_id" id="semester">
+                        <option value="">— All Semesters —</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="form-footer">
-            <a href="{% url 'faculty_notices' %}" class="btn-cancel">Cancel</a>
-            <button type="submit" class="btn-submit">Post Notice</button>
-        </div>
-    </form>
-</main>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="attachment">Attachment (Optional)</label>
+                <input type="file" id="attachment" name="attachment">
+            </div>
 
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                <a href="
+                {% if request.user.profile.role == 'ADMIN' %}
+                    {% url 'admin_notices' %}
+                {% else %}
+                    {% url 'faculty_notices' %}
+                {% endif %}
+                " class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <span><span class="material-symbols-outlined">campaign</span></span>
+                    <span>Create Notice</span>
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-function handleScopeChange() {
-    const isDept = document.getElementById('scope_dept').checked;
-    const target = document.getElementById('scopeTarget');
-    const deptSel = document.getElementById('department');
-    const semSel = document.getElementById('semester');
-
-    if (isDept) {
-        target.style.display = 'block';
-    } else {
-        target.style.display = 'none';
-        deptSel.value = '';
-        semSel.innerHTML = '<option value="">— Select Department first —</option>';
-        semSel.disabled = true;
-    }
-}
-
-document.getElementById('department').addEventListener('change', function () {
-    const deptId = this.value;
+document.addEventListener('DOMContentLoaded', () => {
+    // Scope details toggle
+    const scopeSelect = document.getElementById('scope');
+    const scopeDetails = document.getElementById('scopeDetails');
+    const deptSelect = document.getElementById('department');
     const semSelect = document.getElementById('semester');
 
-    if (!deptId) {
-        semSelect.innerHTML = '<option value="">— Select Department first —</option>';
-        semSelect.disabled = true;
-        return;
+    function toggleScopeDetails() {
+        if (scopeSelect.value === 'DEPARTMENT') {
+            scopeDetails.style.display = 'flex';
+        } else {
+            scopeDetails.style.display = 'none';
+            if (deptSelect) deptSelect.value = '';
+            if (semSelect) semSelect.value = '';
+        }
+    }
+    
+    if (scopeSelect) {
+        scopeSelect.addEventListener('change', toggleScopeDetails);
+        toggleScopeDetails(); // Initialize on load
     }
 
-    semSelect.innerHTML = '<option value="">Loading...</option>';
-    semSelect.disabled = true;
-
-    fetch(`/ajax/get-semesters/?department_id=${deptId}`)
-        .then(r => r.json())
-        .then(data => {
-            semSelect.innerHTML = '<option value="">— All Semesters —</option>';
-            data.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.textContent = `Semester ${s.number}`;
-                semSelect.appendChild(opt);
-            });
-            semSelect.disabled = false;
-        })
-        .catch(() => {
-            semSelect.innerHTML = '<option value="">Error loading semesters</option>';
+    // Dynamic semesters loader
+    if (deptSelect && semSelect) {
+        deptSelect.addEventListener('change', function () {
+            const deptId = this.value;
+            if (!deptId) {
+                semSelect.innerHTML = '<option value="">— All Semesters —</option>';
+                return;
+            }
+            semSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            fetch(`/ajax/get-semesters/?department_id=${deptId}`)
+                .then(r => r.json())
+                .then(data => {
+                    semSelect.innerHTML = '<option value="">— All Semesters —</option>';
+                    data.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.textContent = `Semester ${s.number}`;
+                        
+                        // If it matches old form_data
+                        if (opt.value === "{{ form_data.semester_id }}") {
+                            opt.selected = true;
+                        }
+                        
+                        semSelect.appendChild(opt);
+                    });
+                })
+                .catch(() => {
+                    semSelect.innerHTML = '<option value="">Error loading semesters</option>';
+                });
         });
+
+        // Trigger change if department is prefilled
+        if (deptSelect.value) {
+            deptSelect.dispatchEvent(new Event('change'));
+        }
+    }
 });
 </script>
+{% endblock %}

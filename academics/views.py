@@ -466,6 +466,12 @@ def create_notice(request):
     if profile.role not in ['ADMIN', 'FACULTY']:
         return render(request, '403.html', {'message': 'Admins or Faculty Only.'}, status=403)
 
+    if profile.role == 'ADMIN':
+        departments_qs = Department.objects.all()
+    else:
+        departments_qs = Department.objects.filter(id=profile.department_id)
+    departments = [(d.id, d.name) for d in departments_qs]
+
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
@@ -491,7 +497,10 @@ def create_notice(request):
                     notice.academic_class = academic_class
                 else:
                     messages.error(request, "Selected Class/Semester not found.")
-                    return redirect('create_notice')
+                    return render(request, 'faculty/create_notice.html', {
+                        'departments': departments,
+                        'form_data': request.POST
+                    })
             else:
                 notice.notice_type = 'DEPARTMENT'
                 notice.department_id = department_id
@@ -503,20 +512,19 @@ def create_notice(request):
             notice.full_clean()
             notice.save()
             messages.success(request, "Notice posted successfully ✅")
-            return redirect('admin_dashboard' if profile.role == 'ADMIN' else 'faculty_dashboard')
+            return redirect('admin_notices' if profile.role == 'ADMIN' else 'faculty_notices')
         except ValidationError as e:
             messages.error(request, e.messages[0])
-            return redirect('create_notice')
+            return render(request, 'faculty/create_notice.html', {
+                'departments': departments,
+                'form_data': request.POST
+            })
         except Exception as e:
             messages.error(request, str(e))
-            return redirect('create_notice')
-
-    if profile.role == 'ADMIN':
-        departments_qs = Department.objects.all()
-    else:
-        departments_qs = Department.objects.filter(id=profile.department_id)
-    
-    departments = [(d.id, d.name) for d in departments_qs]
+            return render(request, 'faculty/create_notice.html', {
+                'departments': departments,
+                'form_data': request.POST
+            })
 
     return render(request, 'faculty/create_notice.html', {
         'departments': departments
@@ -653,14 +661,25 @@ def create_event(request):
     if profile.role not in ['ADMIN', 'FACULTY']:
         return render(request, '403.html', {'message': 'Only Admin or Faculty can create events.'}, status=403)
 
+    departments_qs = Department.objects.all()
+    departments = [(d.id, d.name) for d in departments_qs]
+
+    semesters_qs = Semester.objects.all()
+    semesters = [(s.id, s.semester_number) for s in semesters_qs]
+
+    faculties = []
+    if profile.role == 'ADMIN':
+        faculties_qs = Profile.objects.filter(role='FACULTY')
+        faculties = [(f.id, f.full_name) for f in faculties_qs]
+
     if request.method == 'POST':
-        title = request.POST['title']
-        description = request.POST['description']
-        event_date = request.POST['event_date']
-        start_time = request.POST['start_time']
-        end_time = request.POST['end_time']
-        venue = request.POST['venue']
-        google_form_link = request.POST['google_form_link']
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        event_date = request.POST.get('event_date', '').strip()
+        start_time = request.POST.get('start_time', '').strip()
+        end_time = request.POST.get('end_time', '').strip()
+        venue = request.POST.get('venue', '').strip()
+        google_form_link = request.POST.get('google_form_link', '').strip()
 
         department_id = request.POST.get('department_id') or None
         semester_id = request.POST.get('semester_id') or None
@@ -668,24 +687,26 @@ def create_event(request):
         if profile.role == 'FACULTY':
             faculty_incharge = profile
         else:
-            faculty_incharge_id = request.POST['faculty_incharge_id']
-            faculty_incharge = get_object_or_404(Profile, id=faculty_incharge_id)
+            faculty_incharge_id = request.POST.get('faculty_incharge_id')
+            if faculty_incharge_id:
+                faculty_incharge = get_object_or_404(Profile, id=faculty_incharge_id)
+            else:
+                faculty_incharge = profile
 
         poster = request.FILES.get('poster')
 
         event = Event(
             title=title,
             description=description,
-            event_date=event_date,
-            start_time=start_time,
-            end_time=end_time,
+            event_date=event_date if event_date else None,
+            start_time=start_time if start_time else None,
+            end_time=end_time if end_time else None,
             venue=venue,
             google_form_link=google_form_link,
             created_by=profile,
             faculty_incharge=faculty_incharge
         )
 
-        # Handle scopes matching validation rules
         if department_id:
             if semester_id:
                 academic_class = AcademicClass.objects.filter(department_id=department_id, semester_id=semester_id).first()
@@ -694,7 +715,13 @@ def create_event(request):
                     event.academic_class = academic_class
                 else:
                     messages.error(request, "Selected Class/Semester not found.")
-                    return redirect('create_event')
+                    return render(request, 'faculty/create_event.html', {
+                        'role': profile.role,
+                        'departments': departments,
+                        'semesters': semesters,
+                        'faculties': faculties,
+                        'form_data': request.POST
+                    })
             else:
                 event.event_type = 'DEPARTMENT'
                 event.department_id = department_id
@@ -707,22 +734,26 @@ def create_event(request):
         try:
             event.full_clean()
             event.save()
-            return redirect('/faculty/?event_created=1' if profile.role == 'FACULTY' else '/admin/?event_created=1')
+            messages.success(request, "Event created successfully ✅")
+            return redirect('admin_events' if profile.role == 'ADMIN' else 'faculty_events')
         except ValidationError as e:
             messages.error(request, e.messages[0])
+            return render(request, 'faculty/create_event.html', {
+                'role': profile.role,
+                'departments': departments,
+                'semesters': semesters,
+                'faculties': faculties,
+                'form_data': request.POST
+            })
         except Exception as e:
             messages.error(request, str(e))
-
-    departments_qs = Department.objects.all()
-    departments = [(d.id, d.name) for d in departments_qs]
-
-    semesters_qs = Semester.objects.all()
-    semesters = [(s.id, s.semester_number) for s in semesters_qs]
-
-    faculties = []
-    if profile.role == 'ADMIN':
-        faculties_qs = Profile.objects.filter(role='FACULTY')
-        faculties = [(f.id, f.full_name) for f in faculties_qs]
+            return render(request, 'faculty/create_event.html', {
+                'role': profile.role,
+                'departments': departments,
+                'semesters': semesters,
+                'faculties': faculties,
+                'form_data': request.POST
+            })
 
     return render(request, 'faculty/create_event.html', {
         'role': profile.role,
@@ -744,13 +775,13 @@ def edit_event(request, event_id):
         return render(request, '403.html', {'message': 'You are not allowed to edit this event.'}, status=403)
 
     if request.method == 'POST':
-        event.title = request.POST['title']
-        event.description = request.POST['description']
-        event.event_date = request.POST['event_date']
-        event.start_time = request.POST['start_time']
-        event.end_time = request.POST['end_time']
-        event.venue = request.POST['venue']
-        event.google_form_link = request.POST['google_form_link']
+        event.title = request.POST.get('title', '').strip()
+        event.description = request.POST.get('description', '').strip()
+        event.event_date = request.POST.get('event_date')
+        event.start_time = request.POST.get('start_time')
+        event.end_time = request.POST.get('end_time')
+        event.venue = request.POST.get('venue', '').strip()
+        event.google_form_link = request.POST.get('google_form_link', '').strip()
 
         poster = request.FILES.get('poster')
         if poster:
@@ -759,7 +790,8 @@ def edit_event(request, event_id):
         try:
             event.full_clean()
             event.save()
-            return redirect('event_detail', event_id=event.id)
+            messages.success(request, "Event updated successfully ✅")
+            return redirect('admin_events' if profile.role == 'ADMIN' else 'faculty_events')
         except ValidationError as e:
             messages.error(request, e.messages[0])
         except Exception as e:
@@ -899,10 +931,15 @@ def get_subjects_by_class(request):
         return JsonResponse([], safe=False)
     
     profile = request.user.profile
-    subjects = Subject.objects.filter(
-        academic_class_id=class_id,
-        facultysubject__faculty=profile
-    ).distinct().order_by('name')
+    if profile.role == 'ADMIN':
+        subjects = Subject.objects.filter(
+            academic_class_id=class_id
+        ).distinct().order_by('name')
+    else:
+        subjects = Subject.objects.filter(
+            academic_class_id=class_id,
+            facultysubject__faculty=profile
+        ).distinct().order_by('name')
     
     data = [{'id': s.id, 'name': s.name} for s in subjects]
     return JsonResponse(data, safe=False)

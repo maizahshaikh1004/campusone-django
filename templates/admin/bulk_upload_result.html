@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Upload Summary - CampusOne Admin{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">bar_chart</span></span>
+            <span>Upload Results Summary</span>
+        </h1>
+    </div>
+
+    <!-- Results Banner -->
+    {% if invalid == 0 and duplicates == 0 and inserted > 0 %}
+        <div class="message-toast success" style="margin-bottom: 2rem; padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; border-radius: 12px;">
+            <div style="font-size: 2rem;"><span class="material-symbols-outlined">celebration</span></div>
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem;">Import Completed Successfully!</h3>
+                <p style="font-size: 0.88rem; opacity: 0.9; margin: 0;">All users from the file were registered and activation emails were sent.</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="message-toast warning" style="margin-bottom: 2rem; padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; border-radius: 12px;">
+            <div style="font-size: 2rem;">⚠️</div>
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem;">Import Finished with Warnings</h3>
+                <p style="font-size: 0.88rem; opacity: 0.9; margin: 0;">Some records were skipped or failed basic validation. See details below.</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Summary Details -->
+    <div class="card" style="padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+        <div class="summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+            <div class="stat-box" style="padding: 1.25rem; border-radius: 8px; background-color: var(--bg-primary); border: 1.5px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                <span class="stat-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Total Rows Analyzed</span>
+                <span class="stat-value" style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">{{ total }}</span>
+            </div>
+            <div class="stat-box inserted" style="padding: 1.25rem; border-radius: 8px; background-color: var(--bg-primary); border: 1.5px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                <span class="stat-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Successfully Imported</span>
+                <span class="stat-value" style="font-size: 1.8rem; font-weight: 700; color: var(--success);">{{ inserted }}</span>
+            </div>
+            <div class="stat-box duplicates" style="padding: 1.25rem; border-radius: 8px; background-color: var(--bg-primary); border: 1.5px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                <span class="stat-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Duplicate Emails (Skipped)</span>
+                <span class="stat-value" style="font-size: 1.8rem; font-weight: 700; color: var(--warning);">{{ duplicates }}</span>
+            </div>
+            <div class="stat-box invalid" style="padding: 1.25rem; border-radius: 8px; background-color: var(--bg-primary); border: 1.5px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                <span class="stat-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Invalid Rows / Failures</span>
+                <span class="stat-value" style="font-size: 1.8rem; font-weight: 700; color: var(--error);">{{ invalid }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <a href="{% url 'bulk_user_upload' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Upload Another File</a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary" style="flex: 1; text-align: center;">Return to Dashboard</a>
+    </div>
+{% endblock %}

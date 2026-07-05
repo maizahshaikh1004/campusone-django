@@ -1,102 +1,102 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_dashboard' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Dashboard</span>
-        </a>
-        <a href="{% url 'create_event' %}" class="create-btn">
-            ➕ Create Event
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}Events - Faculty - CampusOne{% endblock %}
 
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
     <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>🎉</span>
+            <span><span class="material-symbols-outlined">celebration</span></span>
             <span>Events</span>
         </h1>
-        {% if events %}
-        <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
-        {% endif %}
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if events %}
+                <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
+            {% endif %}
+            <a href="{% url 'create_event' %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                <span><span class="material-symbols-outlined">add</span></span>
+                <span>Create Event</span>
+            </a>
+        </div>
     </div>
 
     <!-- Events Grid -->
     {% if events %}
-    <div class="events-grid">
-        {% for e in events %}
-        <div class="event-card">
-            <!-- Poster -->
-            {% if e.poster %}
-                <img src="{{ e.poster.url }}" alt="{{ e.title }}" class="event-poster">
-            {% else %}
-                <div class="event-poster-placeholder">🎉</div>
-            {% endif %}
-
-            <!-- Body -->
-            <div class="event-body">
-                <h2 class="event-title">{{ e.title }}</h2>
-
-                <!-- Scope Badge -->
-                {% if e.academic_class %}
-                    <span class="scope-badge badge-class">🎓 Class: {{ e.academic_class.name }}</span>
-                {% elif e.department %}
-                    <span class="scope-badge badge-dept">🏢 Department: {{ e.department.name }}</span>
-                {% else %}
-                    <span class="scope-badge badge-global">🌐 Global</span>
-                {% endif %}
-
-                <!-- Meta -->
-                <div class="event-meta">
-                    <div class="meta-item">
-                        <span>📅</span>
-                        <strong>{{ e.event_date|date:"d M Y" }}</strong>
-                    </div>
-                    <div class="meta-item">
-                        <span>⏰</span>
-                        <span>{{ e.start_time }} – {{ e.end_time }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span>📍</span>
-                        <span>{{ e.venue }}</span>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="event-actions">
-                    <a href="{% url 'event_detail' e.id %}" class="btn btn-view">👁️ View</a>
-
-                    {% if not readonly %}
-                        {% if e.can_assign %}
-                            <a href="{% url 'assign_event_coordinators' e.id %}" class="btn btn-assign">👥 Coordinators</a>
-                        {% endif %}
-
-                        {% if e.can_edit %}
-                            <a href="{% url 'edit_event' e.id %}" class="btn btn-edit">✏️ Edit</a>
-                        {% endif %}
-
-                        {% if e.can_delete %}
-                            <a href="{% url 'delete_event' e.id %}" onclick="return confirm('Delete this event?')" class="btn btn-delete">🗑️ Delete</a>
-                        {% endif %}
+        <div class="events-grid">
+            {% for e in events %}
+                <div class="event-card">
+                    <!-- Poster -->
+                    {% if e.poster %}
+                        <div class="event-poster">
+                            <img src="{{ e.poster.url }}" alt="{{ e.title }}">
+                        </div>
+                    {% else %}
+                        <div class="event-poster-placeholder"><span class="material-symbols-outlined">celebration</span></div>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-icon">🎉</div>
-        <h3>No Events Found</h3>
-        <p>{% if readonly %}No events have been created.{% else %}You haven't created any events yet.{% endif %}</p>
-    </div>
-    {% endif %}
 
-</main>
+                    <!-- Body -->
+                    <div class="event-body">
+                        <h2 class="event-title">{{ e.title }}</h2>
+
+                        <!-- Scope Badge -->
+                        {% if e.academic_class %}
+                            <span class="scope-badge badge-class"><span class="material-symbols-outlined">school</span> Class: {{ e.academic_class.name }}</span>
+                        {% elif e.department %}
+                            <span class="scope-badge badge-dept">🏢 Department: {{ e.department.name }}</span>
+                        {% else %}
+                            <span class="scope-badge badge-global">🌐 Global</span>
+                        {% endif %}
+
+                        <!-- Meta Info -->
+                        <div class="event-meta" style="margin-top: 0.5rem;">
+                            <div class="meta-item">
+                                <span><span class="material-symbols-outlined">calendar_today</span></span>
+                                <strong>{{ e.event_date|date:"d M Y" }}</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span><span class="material-symbols-outlined">schedule</span></span>
+                                <span>{{ e.start_time }} – {{ e.end_time }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span><span class="material-symbols-outlined">location_on</span></span>
+                                <span>{{ e.venue }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="event-actions" style="margin-top: auto; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="{% url 'event_detail' e.id %}" class="btn btn-view"><span class="material-symbols-outlined">visibility</span> View</a>
+
+                            {% if not readonly %}
+                                {% if e.can_assign %}
+                                    <a href="{% url 'assign_event_coordinators' e.id %}" class="btn btn-assign"><span class="material-symbols-outlined">groups</span> Coordinators</a>
+                                {% endif %}
+
+                                {% if e.can_edit %}
+                                    <a href="{% url 'edit_event' e.id %}" class="btn btn-edit" style="margin-left: 0;"><span class="material-symbols-outlined">edit</span> Edit</a>
+                                {% endif %}
+
+                                {% if e.can_delete %}
+                                    <a href="{% url 'delete_event' e.id %}" onclick="return confirm('Delete this event?')" class="btn btn-delete" style="margin-left: 0; color: var(--error);"><span class="material-symbols-outlined">delete</span> Delete</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">celebration</span></div>
+            <h3 class="empty-title">No Events Found</h3>
+            <p class="empty-text">{% if readonly %}No events have been created.{% else %}You haven't created any events yet.{% endif %}</p>
+        </div>
+    {% endif %}
+{% endblock %}

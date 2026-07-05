@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Attendance Correction - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'attendance_corrections_admin' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Correction Requests</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <div class="auth-wrapper" style="min-height: auto; padding: 2rem 0;">
+        <div class="auth-card" style="max-width: 600px; border-top: 4px solid var(--error);">
+            <div class="auth-header">
+                <h1 style="color: var(--error); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <span><span class="material-symbols-outlined">close</span></span>
+                    <span>Reject Attendance Correction</span>
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Please provide a reason for rejecting this request.</p>
+            </div>
+
+            <div class="info-card" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: var(--text-secondary);">Correction Request ID:</span>
+                        <span style="font-weight: 700; color: var(--text-primary);">#{{ request_data.id }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: var(--text-secondary);">Student Name:</span>
+                        <span style="font-weight: 700; color: var(--text-primary);">{{ request_data.attendance_record.student.full_name }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: var(--text-secondary);">Faculty Member:</span>
+                        <span style="font-weight: 700; color: var(--text-primary);">{{ request_data.faculty.full_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if error %}
+                <div class="message-toast error" style="margin-bottom: 1.5rem;">
+                    <span>⚠️</span>
+                    <span>{{ error }}</span>
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="remark" style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; display: block;">Reason for Rejection *</label>
+                    <textarea id="remark" name="remark" required placeholder="Describe the reason why this correction request is being rejected..." style="min-height: 120px;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <a href="{% url 'attendance_corrections_admin' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                    <button type="submit" class="btn btn-primary" style="flex: 1; background-color: var(--error); color: white;">Reject Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

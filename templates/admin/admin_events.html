@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Events - CampusOne Admin{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">calendar_today</span></span>
+            <span>Manage Events</span>
+        </h1>
+        <div class="header-actions">
+            <a href="{% url 'create_event' %}" class="btn btn-primary">
+                <span><span class="material-symbols-outlined">add</span></span>
+                <span>Create Event</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-card">
+        <form method="get" class="search-form">
+            <input type="text" name="search" class="search-input" placeholder="Search event title..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">Search</button>
+            <a href="?" class="btn btn-secondary" style="padding: 0.6rem 1.25rem;">Reset</a>
+        </form>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-grid">
+        {% for e in events %}
+            <div class="event-card">
+                <div class="event-poster">
+                    {% if e.poster %}
+                        <img src="{{ e.poster.url }}" alt="{{ e.title }}">
+                    {% else %}
+                        <span class="material-symbols-outlined">celebration</span>
+                    {% endif %}
+                    <span class="event-scope-badge">
+                        {% if e.event_type == 'GENERAL' %}
+                            Global
+                        {% elif e.event_type == 'DEPARTMENT' %}
+                            {{ e.department.name }}
+                        {% else %}
+                            {{ e.academic_class.name }}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="event-content">
+                    <h3 class="event-title">{{ e.title }}</h3>
+                    <p class="event-desc">{{ e.description }}</p>
+
+                    <div class="event-meta" style="margin-top: 1rem;">
+                        <div class="meta-row">
+                            <span><span class="material-symbols-outlined">calendar_today</span></span>
+                            <span>{{ e.event_date|date:"d M Y" }}</span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 0.25rem;">
+                            <span><span class="material-symbols-outlined">schedule</span></span>
+                            <span>{{ e.start_time }} - {{ e.end_time }}</span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 0.25rem;">
+                            <span><span class="material-symbols-outlined">location_on</span></span>
+                            <span>{{ e.venue }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer" style="padding: 1rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div class="organizer-info" style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <span><span class="material-symbols-outlined">person</span> {{ e.faculty_incharge.full_name }}</span>
+                    </div>
+                    <div class="actions-group" style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'edit_event' e.id %}" class="btn-action edit"><span class="material-symbols-outlined">edit</span> Edit</a>
+                        <a href="{% url 'delete_event' e.id %}" class="btn-action delete" onclick="return confirm('Delete this event?');"><span class="material-symbols-outlined">delete</span> Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+                <h3 class="empty-title">No Events Found</h3>
+                <p class="empty-text">Try resetting the search filters.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

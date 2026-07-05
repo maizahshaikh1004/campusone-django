@@ -1,110 +1,91 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="
-    {% if request.user.profile.role == 'ADMIN' %}
-        {% url 'admin_dashboard' %}
-    {% elif request.user.profile.role == 'FACULTY' %}
-        {% url 'faculty_dashboard' %}
-    {% else %}
-        {% url 'student_dashboard' %}
-    {% endif %}
-    " class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main Container -->
-    <div class="container">
-        
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>👤</span>
-                <span>My Profile</span>
-            </h1>
-        </div>
-    
-        <!-- Profile Card -->
-        <div class="profile-card">
-            
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="avatar-container">
-                    {% if profile and profile.profile_photo %}
-                        <img src="/media/{{ profile.profile_photo.url }}" class="avatar" alt="Profile photo">
-                    {% else %}
-                        <div class="no-avatar">{{ profile.full_name|slice:":1"|upper }}</div>
-                    {% endif %}
-                </div>
-                
-                <div class="profile-identity">
-                    <h2 class="profile-name">{{ profile.full_name }}</h2>
-                    <div class="profile-role">{{ profile.role }}</div>
-                    <div class="profile-email">{{ profile.user.email }}</div>
-                </div>
-            </div>
-    
-            <!-- Personal Information -->
-            <div class="info-section">
-                <h3 class="section-title">
-                    <span>📋</span>
-                    <span>Personal Information</span>
-                </h3>
-                <div class="info-grid">
-                    {% if profile.department %}
-                    <div class="info-item">
-                        <div class="info-label">Department</div>
-                        <div class="info-value">{{ profile.department }}</div>
-                    </div>
-                    {% endif %}
-    
-                    {% if profile.academic_class.semester %}
-                    <div class="info-item">
-                        <div class="info-label">Semester</div>
-                        <div class="info-value">{{ profile.academic_class.semester }}</div>
-                    </div>
-                    {% endif %}
-    
-                    <div class="info-item">
-                        <div class="info-label">Phone Number</div>
-                        <div class="info-value {% if not profile.phone %}empty{% endif %}">
-                            {{ profile.phone|default:"Not provided" }}
-                        </div>
-                    </div>
-    
-                    <div class="info-item">
-                        <div class="info-label">Address</div>
-                        <div class="info-value {% if not profile.address %}empty{% endif %}">
-                            {{ profile.address|default:"Not provided" }}
-                        </div>
-                    </div>
-    
-                    <div class="info-item" style="grid-column: 1 / -1;">
-                        <div class="info-label">Bio</div>
-                        <div class="info-value {% if not profile.bio %}empty{% endif %}">
-                            {{ profile.bio|default:"No bio provided" }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            
-    
-            <!-- Actions -->
-            <div class="actions">
-                <a href="{%url 'edit_profile'%}">Edit Profile</a>
-                
-                
-            </div>
-    
-        </div>
-    
+{% block title %}My Profile - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">person</span></span>
+            <span>My Profile</span>
+        </h1>
     </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar-container">
+                {% if profile and profile.profile_photo %}
+                    <img src="/media/{{ profile.profile_photo.url }}" class="avatar" alt="Profile photo">
+                {% else %}
+                    <div class="no-avatar">{{ profile.full_name|slice:":1"|upper }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="profile-identity">
+                <h2 class="profile-name" style="color: white;">{{ profile.full_name }}</h2>
+                <div class="profile-role">{{ profile.role }}</div>
+                <div class="profile-email">{{ profile.user.email }}</div>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="info-section">
+            <h3 class="section-title">
+                <span>📋</span>
+                <span>Personal Information</span>
+            </h3>
+            <div class="info-grid">
+                {% if profile.department %}
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value">{{ profile.department }}</div>
+                </div>
+                {% endif %}
+
+                {% if profile.academic_class %}
+                <div class="info-item">
+                    <div class="info-label">Class</div>
+                    <div class="info-value">{{ profile.academic_class.name }}</div>
+                </div>
+                {% endif %}
+
+                {% if profile.academic_class.semester %}
+                <div class="info-item">
+                    <div class="info-label">Semester</div>
+                    <div class="info-value">{{ profile.academic_class.semester }}</div>
+                </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value {% if not profile.phone %}empty{% endif %}">
+                        {{ profile.phone|default:"Not provided" }}
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Address</div>
+                    <div class="info-value {% if not profile.address %}empty{% endif %}">
+                        {{ profile.address|default:"Not provided" }}
+                    </div>
+                </div>
+
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Bio</div>
+                    <div class="info-value {% if not profile.bio %}empty{% endif %}">
+                        {{ profile.bio|default:"No bio provided" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="{% url 'edit_profile' %}"><span class="material-symbols-outlined">edit</span> Edit Profile</a>
+        </div>
+
+    </div>
+{% endblock %}

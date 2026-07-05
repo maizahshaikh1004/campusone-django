@@ -1,89 +1,133 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_assignments' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Assignments</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📤</span>
-                <span>Submit Assignment</span>
-            </h1>
-            <p>Upload your completed assignment file</p>
-        </div>
-    
-        <!-- Alert Messages -->
-        {% if message %}
-        <div class="alert alert-error">
-            <div class="alert-icon">⚠️</div>
-            <div class="alert-text">{{ message }}</div>
-        </div>
-        {% endif %}
-    
-        {% if is_overdue %}
-        <div class="alert alert-warning">
-            <div class="alert-icon">⏰</div>
-            <div class="alert-text">You are submitting this assignment past the due date</div>
-        </div>
-        {% endif %}
-    
-        <!-- Assignment Info -->
-        <div class="info-card">
-            <div class="info-header">Assignment Details</div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Subject</div>
-                    <div class="info-value">{{ assignment.faculty_subject.subject.name }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Due Date</div>
-                    <div class="info-value">{{ assignment.due_date }}</div>
-                </div>
-                <div class="info-item full-width">
-                    <div class="info-label">Title</div>
-                    <div class="info-value">{{ assignment.title }}</div>
-                </div>
-                <div class="info-item full-width">
-                    <div class="info-label">Description</div>
-                    <div class="info-value">{{ assignment.description }}</div>
-                </div>
+{% block title %}Submit Assignment - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'student_assignments' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Assignments</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">upload</span></span>
+            <span>Submit Assignment</span>
+        </h1>
+        <p>Upload your completed assignment file</p>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if message %}
+    <div class="message-toast error">
+        <span>⚠️</span>
+        <span>{{ message }}</span>
+    </div>
+    {% endif %}
+
+    {% if is_overdue %}
+    <div class="message-toast warning">
+        <span><span class="material-symbols-outlined">schedule</span></span>
+        <span>You are submitting this assignment past the due date</span>
+    </div>
+    {% endif %}
+
+    <!-- Assignment Info -->
+    <div class="info-card">
+        <div class="info-header">Assignment Details</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Subject</div>
+                <div class="info-value">{{ assignment.faculty_subject.subject.name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Due Date</div>
+                <div class="info-value">{{ assignment.due_date }}</div>
+            </div>
+            <div class="info-item full-width" style="margin-top: 1rem;">
+                <div class="info-label">Title</div>
+                <div class="info-value">{{ assignment.title }}</div>
+            </div>
+            <div class="info-item full-width" style="margin-top: 1rem;">
+                <div class="info-label">Description</div>
+                <div class="info-value" style="font-weight: normal; color: var(--text-secondary);">{{ assignment.description }}</div>
             </div>
         </div>
-    
-        <!-- Upload Form -->
-        <form method="post" enctype="multipart/form-data" id="uploadForm">
-            {% csrf_token %}
-    
-            <div class="upload-card">
-                <label class="upload-label" for="submission_file">Upload Your Submission</label>
-                
-                <label for="submission_file" class="file-upload-area" id="fileUploadArea">
-                    <div class="upload-icon">📄</div>
-                    <div class="upload-text">Click to upload or drag and drop</div>
-                    <div class="upload-hint">Accepted formats: PDF, DOC, DOCX (max 10MB)</div>
-                    <div class="file-name" id="fileName" style="display:none;"></div>
-                </label>
-                
-                <input type="file" name="submission_file" id="submission_file" accept=".pdf,.doc,.docx" required>
-            </div>
-    
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <span>📤</span>
-                <span>Submit Assignment</span>
-            </button>
-        </form>
-    
-    </main>
+    </div>
+
+    <!-- Upload Form -->
+    <form method="post" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+
+        <div class="upload-card">
+            <label class="upload-label" for="submission_file">Upload Your Submission</label>
+            
+            <label for="submission_file" class="file-upload-area" id="fileUploadArea">
+                <div class="upload-icon"><span class="material-symbols-outlined">draft</span></div>
+                <div class="upload-text" id="uploadText">Click to upload or drag and drop</div>
+                <div class="upload-hint">Accepted formats: PDF, DOC, DOCX (max 10MB)</div>
+                <div class="file-name" id="fileName" style="display:none;"></div>
+            </label>
+            
+            <input type="file" name="submission_file" id="submission_file" accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn" style="padding: 1rem;">
+            <span><span class="material-symbols-outlined">upload</span></span>
+            <span>Submit Assignment</span>
+        </button>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('submission_file');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileNameDiv = document.getElementById('fileName');
+    const uploadText = document.getElementById('uploadText');
+
+    // Highlight drop area when dragging file over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--accent)';
+            fileUploadArea.style.backgroundColor = 'var(--accent-light)';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--border-color)';
+            fileUploadArea.style.backgroundColor = 'var(--bg-primary)';
+        }, false);
+    });
+
+    // Handle dropped files
+    fileUploadArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            updateFileName(files[0].name);
+        }
+    }, false);
+
+    // Handle selected files
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            updateFileName(fileInput.files[0].name);
+        }
+    });
+
+    function updateFileName(name) {
+        fileNameDiv.textContent = name;
+        fileNameDiv.style.display = 'block';
+        uploadText.textContent = 'Change selected file';
+    }
+});
+</script>
+{% endblock %}

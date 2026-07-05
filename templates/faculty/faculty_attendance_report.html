@@ -1,21 +1,19 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_dashboard' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Dashboard</span>
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}Attendance Report - Faculty - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>📊</span>
+            <span><span class="material-symbols-outlined">bar_chart</span></span>
             <span>Attendance Report</span>
         </h1>
     </div>
@@ -23,7 +21,7 @@
     <!-- Report Table -->
     {% if report %}
         <div class="table-responsive">
-            <table class="report-table">
+            <table>
                 <thead>
                     <tr>
                         <th>Student Name</th>
@@ -35,7 +33,7 @@
                 <tbody>
                     {% for item in report %}
                         <tr>
-                            <td><strong>{{ item.student.full_name }}</strong></td>
+                            <td><strong style="font-weight: 600; color: var(--text-primary);">{{ item.student.full_name }}</strong></td>
                             <td>{{ item.class_name }}</td>
                             <td>{{ item.subject_name }}</td>
                             <td>
@@ -50,9 +48,9 @@
         </div>
     {% else %}
         <div class="empty-state">
-            <div class="empty-icon">📊</div>
-            <h3>No Report Data</h3>
-            <p>Ensure students are enrolled and attendance is marked.</p>
+            <div class="empty-icon"><span class="material-symbols-outlined">bar_chart</span></div>
+            <h3 class="empty-title">No Report Data</h3>
+            <p class="empty-text">Ensure students are enrolled and attendance is marked.</p>
         </div>
     {% endif %}
-</main>
+{% endblock %}

@@ -1,144 +1,120 @@
-<a href="{%url 'profile' %}">View Profile</a>
+{% extends 'base.html' %}
 
-<h1>Student Dashboard</h1>
-<p>Hello {{ name }}</p>
+{% block title %}Student Dashboard - CampusOne{% endblock %}
 
-<div class="activity-card">
-    <div class="activity-header">
-        <h2 class="activity-title">Recent Notices</h2>
-        <a href="{% url 'student_notices' %}"> View All</a>
+{% block content %}
+    <!-- Welcome Banner -->
+    <div style="background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%); border-radius: 16px; padding: 2.5rem; color: white; margin-bottom: 2.5rem; position: relative; overflow: hidden;">
+        <div style="position: relative; z-index: 1;">
+            <h1 style="color: white; margin-bottom: 0.5rem;">Welcome back, {{ name }}!</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1rem;">Here is a summary of your academic activities today.</p>
+        </div>
     </div>
 
-    {% for notice in recent_notices %}
-        <div class="activity-item">
-            <div class="activity-item-title">
-                {{ notice.title }}
-            </div>
-
-            <div class="activity-item-meta">
-                {{ notice.created_at|date:"d M Y" }}
-            </div>
-        </div>
-    {% empty %}
-        <div class="empty-state">
-            <div class="empty-text">
-                No notices available.
-            </div>
-        </div>
-    {% endfor %}
-
-    <!-- Upcoming Events -->
-    <div class="activity-card">
-    <div class="activity-header">
-        <h2 class="activity-title">Upcoming Events</h2>
-        <a href="{% url 'student_events' %}"> View All</a>
-    </div>
-
-    {% for event in upcoming_events %}
-    <div class="activity-item">
-
-        <div class="activity-item-content">
-
-            <div class="activity-info">
-
-                <div class="activity-item-title">
-                    {{ event.title }}
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <!-- Overall Attendance -->
+        <div class="stat-card">
+            <span class="stat-label">Overall Attendance</span>
+            <div class="attendance-ring-wrapper">
+                <div class="attendance-ring" style="background: conic-gradient(var(--accent) 0% {{ attendance_percentage }}%, var(--border-color) {{ attendance_percentage }}% 100%);">
+                    <span class="attendance-percentage">{{ attendance_percentage }}%</span>
                 </div>
-
-                <div class="activity-item-meta">
-                    <span>📅</span>
-
-                    <span>
-                        {{ event.event_date|date:"d M Y" }}
-                    </span>
-
-                    <span>⏰</span>
-
-                    <span>
-                        {{ event.start_time }}
-                    </span>
+                <div>
+                    <span class="stat-subtitle">Keep it up!</span>
                 </div>
-
             </div>
-
-            <span class="activity-badge badge-event">
-                Event
-            </span>
-
+            <a href="{% url 'student_attendance' %}">View Details →</a>
         </div>
 
-    </div>
-
-    {% empty %}
-
-    <div class="empty-state">
-
-        <div class="empty-icon">
-            📅
-        </div>
-
-        <div class="empty-text">
-            No upcoming events
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-    <div class="stat-value">
-        Total Subjects: 
-        {{ total_subjects }}
-
-        <a href="{%url 'student_subjects'%}">View All</a>
-    </div>
-
-    <!-- Pending Assignments -->
-    <div class="stat-card assignments"> 
-        <div class="stat-header">
-            <div class="stat-icon pink">📝</div>
-        </div>
-        <div class="stat-label">Pending</div>
-        <div class="stat-value">{{ pending_assignments_count }}</div>
-        <div class="stat-subtitle">Assignments due</div>
-        <a href="{%url 'student_assignments'%}">View All</a>
-
-    </div>
-
-    <!-- Event Coordinator -->
-    <div class="stat-card coordinator" >
-        <div class="stat-header">
-            <div class="stat-icon green">🎯</div>
-        </div>
-        <div class="stat-label">Coordinator</div>
-        <div class="stat-value">{{ coordinator_events_count }}</div>
-        <div class="stat-subtitle">Events managing</div>
-        <a href="{% url 'student_coordinator_events' %}">View</a>
-    </div>
-
-    <!-- Attendance -->
-    <div class="stat-card attendance" >
-        <div class="stat-label">Overall Attendance</div>
-        <a href="{% url 'student_attendance'%}">View</a>
-        <div class="attendance-ring-wrapper">
-            <div class="attendance-ring">
-                <span class="attendance-percentage">{{ attendance_percentage }}%</span>
+        <!-- Total Subjects -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon purple"><span class="material-symbols-outlined">book</span></div>
             </div>
-            <div>
-                <div class="stat-subtitle">Keep it up!</div>
+            <span class="stat-label">My Subjects</span>
+            <span class="stat-value">{{ total_subjects }}</span>
+            <span class="stat-subtitle">Registered courses</span>
+            <a href="{% url 'student_subjects' %}">View All →</a>
+        </div>
+
+        <!-- Pending Assignments -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon pink"><span class="material-symbols-outlined">description</span></div>
             </div>
+            <span class="stat-label">Pending Assignments</span>
+            <span class="stat-value">{{ pending_assignments_count }}</span>
+            <span class="stat-subtitle">Requires submission</span>
+            <a href="{% url 'student_assignments' %}">View All →</a>
         </div>
+
+        <!-- Today's Lectures -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon indigo"><span class="material-symbols-outlined">calendar_month</span></div>
+            </div>
+            <span class="stat-label">Today's Lectures</span>
+            <span class="stat-value">{{ today_lectures_count }}</span>
+            <span class="stat-subtitle">Scheduled classes today</span>
+            <a href="{% url 'student_timetable' %}">View Timetable →</a>
+        </div>
+
+        <!-- Coordinator Roles -->
+        {% if coordinator_events_count > 0 %}
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon green"><span class="material-symbols-outlined">track_changes</span></div>
+            </div>
+            <span class="stat-label">Coordinating</span>
+            <span class="stat-value">{{ coordinator_events_count }}</span>
+            <span class="stat-subtitle">Active events managing</span>
+            <a href="{% url 'student_coordinator_events' %}">View Events →</a>
+        </div>
+        {% endif %}
     </div>
 
-    <!--Timetable-->
-    <div class="stat-card timetable" >
-        <div class="stat-header">
-            <div class="stat-icon indigo">🗓️</div>
+    <!-- Recent Notices and Events row -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Recent Notices -->
+        <div class="activity-card">
+            <div class="activity-header">
+                <h2 class="activity-title">Recent Notices</h2>
+                <a href="{% url 'student_notices' %}" class="back-link">View All</a>
+            </div>
+            {% for notice in recent_notices %}
+                <div class="activity-item">
+                    <span class="activity-item-title">{{ notice.title }}</span>
+                    <span class="activity-item-meta">{{ notice.created_at|date:"d M" }}</span>
+                </div>
+            {% empty %}
+                <div class="empty-state" style="border: none; padding: 2rem;">
+                    <div class="empty-icon"><span class="material-symbols-outlined">campaign</span></div>
+                    <div class="empty-text">No announcements today.</div>
+                </div>
+            {% endfor %}
         </div>
-        <div class="stat-label">Timetable</div>
-        <a href="{% url 'student_timetable'%}">View all</a>
-        <div class="stat-value">{{ today_lectures_count }}</div>
-        <div class="stat-subtitle">Todays's Lectures</div>
-    </div>
 
-</div>
-</div>
+        <!-- Upcoming Events -->
+        <div class="activity-card">
+            <div class="activity-header">
+                <h2 class="activity-title">Upcoming Events</h2>
+                <a href="{% url 'student_events' %}" class="back-link">View All</a>
+            </div>
+            {% for event in upcoming_events %}
+                <div class="activity-item">
+                    <div>
+                        <div class="activity-item-title">{{ event.title }}</div>
+                        <div class="activity-item-meta"><span class="material-symbols-outlined">calendar_today</span> {{ event.event_date|date:"d M" }} at {{ event.start_time }}</div>
+                    </div>
+                    <span class="activity-badge badge-event">Event</span>
+                </div>
+            {% empty %}
+                <div class="empty-state" style="border: none; padding: 2rem;">
+                    <div class="empty-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+                    <div class="empty-text">No upcoming campus events.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

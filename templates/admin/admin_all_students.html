@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}All Students - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">school</span></span>
+            <span>Students Directory</span>
+        </h1>
+        <div class="count-badge">{{ students|length }} Student{{ students|length|pluralize }}</div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="filters-card">
+        <form method="get" class="filters-form">
+            <div class="filter-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" name="search" class="input-field" placeholder="Search name, email, username..." value="{{ search_query }}">
+            </div>
+            
+            <div class="filter-group">
+                <label for="department">Department</label>
+                <select id="department" name="department" class="select-field">
+                    <option value="">All Departments</option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}" {% if selected_dept == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="class">Class</label>
+                <select id="class" name="class" class="select-field">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                        <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="semester">Semester</label>
+                <select id="semester" name="semester" class="select-field">
+                    <option value="">All Semesters</option>
+                    {% for s in semesters %}
+                        <option value="{{ s.id }}" {% if selected_sem == s.id|stringformat:"s" %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem;">Search</button>
+                <a href="?" class="btn btn-secondary" style="padding: 0.65rem 1.25rem;">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-secondary); margin-bottom: 2rem;">
+        {% if students %}
+            <div class="table-responsive" style="margin-bottom: 0; border: none; border-radius: 0; box-shadow: none;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Class</th>
+                            <th>Semester</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar">{{ s.full_name|slice:":1"|upper }}</div>
+                                        <a href="{% url 'view_profile' s.id %}" class="user-name">{{ s.full_name }}</a>
+                                    </div>
+                                </td>
+                                <td>{{ s.user.email }}</td>
+                                <td>{% if s.department %}{{ s.department.name }}{% else %}<span class="muted">—</span>{% endif %}</td>
+                                <td>{% if s.academic_class %}{{ s.academic_class.name }}{% else %}<span class="muted">—</span>{% endif %}</td>
+                                <td>{% if s.academic_class.semester %}{{ s.academic_class.semester }}{% else %}<span class="muted">—</span>{% endif %}</td>
+                                <td>
+                                    {% if s.user.is_active %}
+                                        <span class="status-badge status-present">Active</span>
+                                    {% else %}
+                                        <span class="status-badge status-absent">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if s.user.is_active %}
+                                        <a href="{% url 'toggle_user_status' s.id %}?next={{ request.get_full_path|urlencode }}" class="btn-toggle deactivate" onclick="return confirm('Deactivate student {{ s.full_name }}?');">Deactivate</a>
+                                    {% else %}
+                                        <a href="{% url 'toggle_user_status' s.id %}?next={{ request.get_full_path|urlencode }}" class="btn-toggle activate" onclick="return confirm('Activate student {{ s.full_name }}?');">Activate</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><span class="material-symbols-outlined">groups</span></div>
+                <h3 class="empty-title">No Students Found</h3>
+                <p class="empty-text">Try resetting the filters or broadening your search term.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -211,19 +211,21 @@ class AttendanceCorrectionRequest(models.Model):
         if self.faculty != attendance_faculty:
             raise ValidationError("Faculty can only request corrections for their own attendance records.")
 
-        if self.attendance_record.is_present == self.requested_is_present:
-            raise ValidationError("Requested Status must be different from Current attendance status.")
-        
-        existing_request = (
-    AttendanceCorrectionRequest.objects.filter(
-        attendance_record=self.attendance_record,
-        status="PENDING"
-    ).exclude(pk=self.pk))
+        if self.status == 'PENDING':
+            if self.attendance_record.is_present == self.requested_is_present:
+                raise ValidationError("Requested Status must be different from Current attendance status.")
+            
+            existing_request = (
+                AttendanceCorrectionRequest.objects.filter(
+                    attendance_record=self.attendance_record,
+                    status="PENDING"
+                ).exclude(pk=self.pk)
+            )
 
-        if existing_request.exists():
-            raise ValidationError(
-        "A pending correction request already exists."
-    )
+            if existing_request.exists():
+                raise ValidationError(
+                    "A pending correction request already exists."
+                )
 
     def save(self, *args, **kwargs):
         self.full_clean()

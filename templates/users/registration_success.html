@@ -1,7 +1,15 @@
-<h1>
-    Registration Request Submitted
-</h1>
+{% extends 'base.html' %}
 
-<p>
-    Your request has been sent to the administrator.
-</p>
+{% block title %}Request Submitted - CampusOne{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="min-height: calc(100vh - 120px);">
+    <div class="auth-card success-card">
+        <div class="success-icon"><span class="material-symbols-outlined">celebration</span></div>
+        <h1>Request Submitted</h1>
+        <p style="margin-bottom: 2rem;">Your registration request has been successfully sent to the administrator. You will receive an email activation link once approved.</p>
+        
+        <a href="{% url 'login' %}" class="btn btn-primary btn-block">Back to Login</a>
+    </div>
+</div>
+{% endblock %}

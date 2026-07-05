@@ -1,13 +1,111 @@
-<h1>CampusOne Registration</h1>
+{% extends 'base.html' %}
 
-<form method="post">
+{% block title %}Request Registration - CampusOne{% endblock %}
 
-    {% csrf_token %}
+{% block content %}
+<div class="auth-wrapper" style="min-height: calc(100vh - 120px);">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Request Registration</h1>
+            <p>Submit your details to request an account</p>
+        </div>
 
-    {{ form.as_p }}
+        {% if error %}
+            <div class="message-toast error">
+                <span>⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
 
-    <button type="submit">
-        Submit Request
-    </button>
+        <form method="post">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
 
-</form>
+            <button type="submit" class="btn btn-primary btn-block">
+                Submit Request
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const roleSelect = document.getElementById('id_role');
+    const deptSelect = document.getElementById('id_department');
+    const classSelect = document.getElementById('id_academic_class');
+    
+    if (!roleSelect || !deptSelect || !classSelect) return;
+    
+    const classContainer = classSelect.closest('p');
+    const initialClassId = classSelect.value;
+    
+    function updateClassVisibility() {
+        const role = roleSelect.value;
+        if (role === 'FACULTY') {
+            if (classContainer) classContainer.style.display = 'none';
+            classSelect.disabled = true;
+            classSelect.required = false;
+            classSelect.value = '';
+        } else {
+            if (classContainer) classContainer.style.display = 'block';
+            classSelect.disabled = false;
+            classSelect.required = true;
+        }
+    }
+    
+    function loadClasses(departmentId, selectClassId = null) {
+        if (!departmentId || roleSelect.value === 'FACULTY') {
+            classSelect.innerHTML = '<option value="">---------</option>';
+            classSelect.disabled = true;
+            return;
+        }
+        
+        classSelect.disabled = true;
+        fetch(`/ajax/get-classes/?department_id=${departmentId}`)
+            .then(res => res.json())
+            .then(data => {
+                let options = '<option value="">---------</option>';
+                if (data.classes) {
+                    data.classes.forEach(cls => {
+                        const classId = cls[0];
+                        const className = cls[1];
+                        const selected = selectClassId && String(classId) === String(selectClassId) ? 'selected' : '';
+                        options += `<option value="${classId}" ${selected}>${className}</option>`;
+                    });
+                }
+                classSelect.innerHTML = options;
+                classSelect.disabled = false;
+            })
+            .catch(err => {
+                console.error('Error fetching classes:', err);
+                classSelect.disabled = false;
+            });
+    }
+    
+    // Listen to changes
+    roleSelect.addEventListener('change', () => {
+        updateClassVisibility();
+        if (roleSelect.value === 'STUDENT') {
+            loadClasses(deptSelect.value);
+        }
+    });
+    
+    deptSelect.addEventListener('change', () => {
+        loadClasses(deptSelect.value);
+    });
+    
+    // Run initially on load
+    updateClassVisibility();
+    if (deptSelect.value) {
+        loadClasses(deptSelect.value, initialClassId);
+    }
+});
+</script>
+{% endblock %}

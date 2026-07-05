@@ -1,21 +1,19 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_dashboard' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Dashboard</span>
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}View Attendance - Faculty - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>👁️</span>
+            <span><span class="material-symbols-outlined">visibility</span></span>
             <span>View Attendance Records</span>
         </h1>
         {% if records %}
@@ -26,7 +24,7 @@
     <!-- Attendance Table -->
     {% if records %}
         <div class="table-responsive">
-            <table class="attendance-table">
+            <table>
                 <thead>
                     <tr>
                         <th>Student</th>
@@ -40,7 +38,7 @@
                 <tbody>
                     {% for r in records %}
                         <tr>
-                            <td><strong>{{ r.student.full_name }}</strong></td>
+                            <td><strong style="font-weight: 600; color: var(--text-primary);">{{ r.student.full_name }}</strong></td>
                             <td>{{ r.attendance_session.timetable.faculty_subject.subject.name }}</td>
                             <td>{{ r.attendance_session.lecture_date|date:"d M Y" }}</td>
                             <td>{{ r.attendance_session.timetable.day|title }}</td>
@@ -59,9 +57,9 @@
         </div>
     {% else %}
         <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <h3>No Attendance Marked Yet</h3>
-            <p>Go to "Mark Attendance" to submit records.</p>
+            <div class="empty-icon"><span class="material-symbols-outlined">description</span></div>
+            <h3 class="empty-title">No Attendance Marked Yet</h3>
+            <p class="empty-text">Go to "Mark Attendance" to submit records.</p>
         </div>
     {% endif %}
-</main>
+{% endblock %}

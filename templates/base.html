@@ -1,25 +1,87 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Campus One</title>
-    <link rel='stylesheet' href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CampusOne{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+
+    <script>
+        // Inline blocking script to prevent theme flashing on load
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('dark-mode');
+            });
+        }
+    </script>
 </head>
 <body>
 
-    <nav>
-        <h2>Campus One</h2>
-    <span>
-        <a href="{% url 'register_request' %}">
-            Sign Up
-        </a>
-    </span>
-        <hr>
+    <!-- Shared Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="
+            {% if request.user.is_authenticated %}
+                {% if request.user.profile.role == 'ADMIN' %}
+                    {% url 'admin_dashboard' %}
+                {% elif request.user.profile.role == 'FACULTY' %}
+                    {% url 'faculty_dashboard' %}
+                {% else %}
+                    {% url 'student_dashboard' %}
+                {% endif %}
+            {% else %}
+                /
+            {% endif %}
+            " class="logo">
+                <span class="material-symbols-outlined logo-icon" style="color: var(--accent); font-size: 1.75rem;">school</span>
+                <span>CampusOne</span>
+            </a>
+            
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="back-link" style="font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">person</span>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="back-link" style="font-size: 0.9rem; color: #ef4444; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem; color: #ef4444;">logout</span>
+                        <span>Logout</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="back-link" style="font-size: 0.9rem;">Sign In</a>
+                    <a href="{% url 'register_request' %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Get Started</a>
+                {% endif %}
 
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <span class="material-symbols-outlined" id="themeIcon" style="font-size: 1.25rem; display: flex; align-items: center; justify-content: center;">dark_mode</span>
+                </button>
+            </div>
+        </div>
     </nav>
 
-    {% block content %}
-    {% endblock %}
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Message Toasts -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="message-toast {{ message.tags }}">
+                <span><span class="material-symbols-outlined">info</span></span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
 
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="{% static 'js/dashboard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,104 +1,116 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="
-            {% if request.user.profile.role == 'ADMIN' %}
-                {% url 'admin_dashboard' %}
-            {% elif request.user.profile.role == 'FACULTY' %}
-                {% url 'faculty_dashboard' %}
-            {% else %}
-                {% url 'student_dashboard' %}
-            {% endif %}
-            " class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📅</span>
-                <span>Events</span>
-            </h1>
-            {% if events %}
-            <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
-            {% endif %}
-        </div>
-    
-        <!-- Events Grid -->
+{% block title %}Events - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">calendar_today</span></span>
+            <span>Events</span>
+        </h1>
         {% if events %}
-        <div class="events-grid">
-            {% for e in events %}
-            <div class="event-card">
-                
-                <!-- Event Image -->
-                <div class="event-image">
-                    {% if e.poster %}
-                        <img src="{{ e.poster.url }}" alt="{{ e.title }}">
-                    {% else %}
-                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:white;font-size:3rem;">
-                            🎉
-                        </div>
-                    {% endif %}
-                    <!-- Dynamic badge will be set by JavaScript -->
-                    <div class="event-badge" data-date="{{ e.event_date|date:'Y-m-d' }}" data-start="{{ e.start_time|time:'H:i:s' }}" data-end="{{ e.end_time|time:'H:i:s' }}">
-                        <span class="badge-icon">📅</span>
-                        <span class="badge-text">Upcoming</span>
-                    </div>
-                </div>
-    
-                <!-- Event Content -->
-                <div class="event-content">
-                    <h2 class="event-title">{{ e.title }}</h2>
-                    <p class="event-description">{{ e.description }}</p>
-    
-                    <div class="event-meta">
-                        <div class="meta-item">
-                            <span>📅</span>
-                            <span>{{ e.event_date|date:"d M Y" }}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span>⏰</span>
-                            <span>{{ e.start_time }} – {{ e.end_time }}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span>📍</span>
-                            <span>{{ e.venue }}</span>
-                        </div>
-                    </div>
-    
-                    <div class="event-footer">
-                        <div class="event-organizer">
-                            <div class="organizer-avatar">{{ e.faculty_incharge.full_name|slice:":1"|upper }}</div>
-                            <span>{{ e.faculty_incharge.full_name }}</span>
-                        </div>
-                        <a href="{% url 'event_detail' e.id %}" class="view-link">
-                            Details →
-                        </a>
-                    </div>
-                </div>
-    
-            </div>
-            {% endfor %}
-        </div>
-    
-        {% else %}
-        <!-- Empty State -->
-        <div class="empty-state">
-            <div class="empty-icon">📅</div>
-            <div class="empty-title">No Events Available</div>
-            <div class="empty-text">Check back later for upcoming campus events</div>
-        </div>
+        <div class="count-badge">{{ events|length }} Event{{ events|length|pluralize }}</div>
         {% endif %}
-    
-    </main>
+    </div>
+
+    <!-- Events Grid -->
+    {% if events %}
+    <div class="events-grid">
+        {% for e in events %}
+        <div class="event-card">
+            
+            <!-- Event Image -->
+            <div class="event-image">
+                {% if e.poster %}
+                    <img src="{{ e.poster.url }}" alt="{{ e.title }}">
+                {% else %}
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                        <span class="material-symbols-outlined">celebration</span>
+                    </div>
+                {% endif %}
+                <!-- Dynamic badge will be set by JavaScript -->
+                <div class="event-badge" data-date="{{ e.event_date|date:'Y-m-d' }}" data-start="{{ e.start_time|time:'H:i:s' }}" data-end="{{ e.end_time|time:'H:i:s' }}">
+                    <span class="badge-icon"><span class="material-symbols-outlined">calendar_today</span></span>
+                    <span class="badge-text">Upcoming</span>
+                </div>
+            </div>
+
+            <!-- Event Content -->
+            <div class="event-content">
+                <h2 class="event-title">{{ e.title }}</h2>
+                <p class="event-description">{{ e.description }}</p>
+
+                <div class="event-meta" style="margin-bottom: 1rem;">
+                    <div class="meta-item">
+                        <span><span class="material-symbols-outlined">calendar_today</span></span>
+                        <span>{{ e.event_date|date:"d M Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span><span class="material-symbols-outlined">schedule</span></span>
+                        <span>{{ e.start_time }} – {{ e.end_time }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span><span class="material-symbols-outlined">location_on</span></span>
+                        <span>{{ e.venue }}</span>
+                    </div>
+                </div>
+
+                <div class="event-footer">
+                    <div class="event-organizer">
+                        <div class="organizer-avatar">{{ e.faculty_incharge.full_name|slice:":1"|upper }}</div>
+                        <span>{{ e.faculty_incharge.full_name }}</span>
+                    </div>
+                    <a href="{% url 'event_detail' e.id %}" class="view-link">
+                        Details →
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+        <div class="empty-title">No Events Available</div>
+        <div class="empty-text">Check back later for upcoming campus events.</div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Dynamic badges update based on current time
+    document.querySelectorAll('.event-badge').forEach(badge => {
+        const dateStr = badge.dataset.date;
+        const startStr = badge.dataset.start;
+        const endStr = badge.dataset.end;
+        
+        const now = new Date();
+        const eventStart = new Date(dateStr + 'T' + startStr);
+        const eventEnd = new Date(dateStr + 'T' + endStr);
+        
+        const iconEl = badge.querySelector('.badge-icon');
+        const textEl = badge.querySelector('.badge-text');
+        
+        if (now < eventStart) {
+            badge.className = 'event-badge upcoming';
+            iconEl.textContent = '<span class="material-symbols-outlined">calendar_today</span>';
+            textEl.textContent = 'Upcoming';
+        } else if (now >= eventStart && now <= eventEnd) {
+            badge.className = 'event-badge ongoing';
+            iconEl.textContent = '<span class="material-symbols-outlined">bolt</span>';
+            textEl.textContent = 'Ongoing';
+        } else {
+            badge.className = 'event-badge completed';
+            iconEl.textContent = '<span class="material-symbols-outlined">check_circle</span>';
+            textEl.textContent = 'Completed';
+        }
+    });
+});
+</script>
+{% endblock %}

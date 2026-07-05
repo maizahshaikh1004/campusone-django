@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Notices - CampusOne Admin{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">campaign</span></span>
+            <span>Manage Notices</span>
+        </h1>
+        <div class="header-actions">
+            <a href="{% url 'create_notice' %}" class="btn btn-primary">
+                <span><span class="material-symbols-outlined">add</span></span>
+                <span>Create Notice</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-card">
+        <form method="get" class="search-form">
+            <input type="text" name="search" class="search-input" placeholder="Search notice title..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">Search</button>
+            <a href="?" class="btn btn-secondary" style="padding: 0.6rem 1.25rem;">Reset</a>
+        </form>
+    </div>
+
+    <!-- Notices List -->
+    <div class="notices-list">
+        {% for n in notices %}
+            <div class="notice-card">
+                <div class="notice-header">
+                    <div>
+                        <h3 class="notice-title">{{ n.title }}</h3>
+                        <div class="notice-meta" style="margin-top: 0.5rem;">
+                            <div class="meta-item">
+                                <span><span class="material-symbols-outlined">person</span></span>
+                                <span>{{ n.created_by.full_name }}</span>
+                            </div>
+                            <span class="meta-divider"></span>
+                            <div class="meta-item">
+                                <span><span class="material-symbols-outlined">calendar_today</span></span>
+                                <span>{{ n.created_at|date:"d M Y, H:i" }}</span>
+                            </div>
+                            {% if n.department %}
+                                <span class="meta-divider"></span>
+                                <div class="meta-item">
+                                    <span>🏢</span>
+                                    <span>{{ n.department.name }}</span>
+                                </div>
+                            {% endif %}
+                            {% if n.academic_class %}
+                                <span class="meta-divider"></span>
+                                <div class="meta-item">
+                                    <span><span class="material-symbols-outlined">school</span></span>
+                                    <span>{{ n.academic_class.name }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <span class="notice-scope-badge">
+                        {% if n.notice_type == 'GENERAL' %}
+                            Global
+                        {% elif n.notice_type == 'DEPARTMENT' %}
+                            Departmental
+                        {% else %}
+                            Class Scoped
+                        {% endif %}
+                    </span>
+                </div>
+
+                <p class="notice-content" style="margin-top: 1rem; color: var(--text-secondary);">{{ n.content }}</p>
+
+                <div class="notice-footer" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    {% if n.attachment %}
+                        <a href="{{ n.attachment.url }}" target="_blank" class="attachment-btn">
+                            <span><span class="material-symbols-outlined">attachment</span></span>
+                            <span>Download Attachment</span>
+                        </a>
+                    {% else %}
+                        <span class="no-attachment">No attachment</span>
+                    {% endif %}
+
+                    <div class="actions-group" style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'edit_notice' n.id %}" class="btn-action edit"><span class="material-symbols-outlined">edit</span> Edit</a>
+                        <a href="{% url 'delete_notice' n.id %}" class="btn-action delete" onclick="return confirm('Delete this notice?');"><span class="material-symbols-outlined">delete</span> Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><span class="material-symbols-outlined">campaign</span></div>
+                <h3 class="empty-title">No Notices Found</h3>
+                <p class="empty-text">Try resetting the search filters.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

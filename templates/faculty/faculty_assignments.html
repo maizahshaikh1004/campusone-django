@@ -1,158 +1,82 @@
-<body>
+{% extends 'base.html' %}
 
-    <nav class="navbar">
-        <div class="nav-container">
-    
-            <a href="{% url 'faculty_dashboard' %}" class="back-link">
-                ← Back to Dashboard
-            </a>
-    
-            <a href="{%url 'create_assignment'%}" class="create-btn">
-                ➕ Create Assignment
-            </a>
-    
-        </div>
-    </nav>
+{% block title %}My Assignments - Faculty - CampusOne{% endblock %}
 
-    <main class="container">
-    
-        <div class="page-header">
-    
-            <h1>📝 My Assignments</h1>
-    
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">description</span></span>
+            <span>My Assignments</span>
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
             {% if assignments %}
-            <div class="count-badge">
-                {{ assignments|length }} Assignment{{ assignments|length|pluralize }}
-            </div>
+                <div class="count-badge">
+                    {{ assignments|length }} Assignment{{ assignments|length|pluralize }}
+                </div>
             {% endif %}
-    
+            <a href="{% url 'create_assignment' %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                <span><span class="material-symbols-outlined">add</span></span>
+                <span>Create Assignment</span>
+            </a>
         </div>
-    
-    
-        {% if assignments %}
-    
-        <div class="assignments-grid">
-    
+    </div>
+
+    {% if assignments %}
+        <div class="assignments-grid" style="margin-bottom: 2rem;">
             {% for assignment in assignments %}
-    
-            <div class="assignment-card">
-    
-                <div class="card-header">
-    
-                    <div>
-    
-                        <h2>
-                            {{ assignment.title }}
-                        </h2>
-    
-                        <p>
-    
-                            📚
-                            {{ assignment.faculty_subject.subject.name }}
-    
-                        </p>
-    
-                        <p>
-    
-                            🎓
-                            {{ assignment.faculty_subject.subject.academic_class }}
-    
-                        </p>
-    
+                <div class="assignment-card">
+                    <div class="card-header" style="border: none; padding-bottom: 0;">
+                        <div class="assignment-info">
+                            <h2 class="assignment-title">{{ assignment.title }}</h2>
+                            <div class="assignment-meta" style="margin-top: 0.5rem;">
+                                <span><span class="material-symbols-outlined">menu_book</span> {{ assignment.faculty_subject.subject.name }}</span>
+                                <span class="meta-divider"></span>
+                                <span><span class="material-symbols-outlined">school</span> {{ assignment.faculty_subject.subject.academic_class }}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge badge-open">
+                            Due: {{ assignment.due_date|date:"d M Y" }}
+                        </span>
                     </div>
-    
-                    <span class="status-badge">
-    
-                        Due:
-                        {{ assignment.due_date }}
-    
-                    </span>
-    
-                </div>
-    
-                {% if assignment.description %}
-    
-                <p>
-    
-                    {{ assignment.description }}
-    
-                </p>
-    
-                {% endif %}
-    
-                <div class="assignment-actions">
-    
-                    {% if assignment.question_file %}
-    
-                    <a
-                        href="{{ assignment.question_file.url }}"
-                        target="_blank"
-                        class="btn">
-    
-                        📎 Question Paper
-    
-                    </a>
-    
+
+                    {% if assignment.description %}
+                        <div class="assignment-description" style="margin-top: 1rem;">
+                            {{ assignment.description }}
+                        </div>
                     {% endif %}
-    
-                    <a
-                        href="{% url 'faculty_submissions' %}?assignment_id={{ assignment.id }}"
-                        class="btn">
-    
-                        📂 Submissions
-    
-                    </a>
-    
-                    <a
-                        href="{%url 'edit_assignment' assignment.id %}"
-                        class="btn">
-    
-                        ✏ Edit
-    
-                    </a>
-    
-                    <a
-                        href="{%url 'delete_assignment' assignment.id%}"
-                        class="btn btn-danger">
-    
-                        🗑 Delete
-    
-                    </a>
-    
+
+                    <div class="assignment-actions" style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        {% if assignment.question_file %}
+                            <a href="{{ assignment.question_file.url }}" target="_blank" class="btn btn-secondary" style="flex: 1; min-width: 140px; font-size: 0.8rem; padding: 0.5rem;">
+                                <span><span class="material-symbols-outlined">attachment</span></span> Question Paper
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'faculty_submissions' %}?assignment_id={{ assignment.id }}" class="btn btn-primary" style="flex: 1; min-width: 120px; font-size: 0.8rem; padding: 0.5rem;">
+                            <span><span class="material-symbols-outlined">folder</span></span> Submissions
+                        </a>
+                        <a href="{% url 'edit_assignment' assignment.id %}" class="btn btn-secondary" style="flex: 1; min-width: 80px; font-size: 0.8rem; padding: 0.5rem;">
+                            <span><span class="material-symbols-outlined">edit</span></span> Edit
+                        </a>
+                        <a href="{% url 'delete_assignment' assignment.id %}" class="btn btn-secondary" style="flex: 1; min-width: 90px; font-size: 0.8rem; padding: 0.5rem; background-color: var(--error-bg); color: var(--error); border-color: var(--error-border);">
+                            <span><span class="material-symbols-outlined">delete</span></span> Delete
+                        </a>
+                    </div>
                 </div>
-    
-            </div>
-    
             {% endfor %}
-    
         </div>
-    
-        {% else %}
-    
+    {% else %}
         <div class="empty-state">
-    
-            <div class="empty-icon">
-    
-                📝
-    
-            </div>
-    
-            <div class="empty-title">
-    
-                No Assignments Yet
-    
-            </div>
-    
-            <div class="empty-text">
-    
-                Click "Create Assignment" to create your first assignment.
-    
-            </div>
-    
+            <div class="empty-icon"><span class="material-symbols-outlined">description</span></div>
+            <h3 class="empty-title">No Assignments Yet</h3>
+            <p class="empty-text">Click "Create Assignment" to create your first assignment.</p>
         </div>
-    
-        {% endif %}
-    
-    </main>
-    
-    </body>
+    {% endif %}
+{% endblock %}

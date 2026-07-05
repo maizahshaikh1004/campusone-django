@@ -1,102 +1,52 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-    
-            <a href="{% url 'faculty_dashboard' %}" class="back-link">
-                ← Back to Dashboard
-            </a>
-    
-        </div>
-    </nav>
-    
-    
-    <main class="container">
-    
-        <div class="page-header">
-    
-            <h1>
-                📚 My Subjects
-            </h1>
-    
-            {% if subjects %}
-                <div class="count-badge">
-                    {{ subjects|length }} Subject{{ subjects|length|pluralize }}
-                </div>
-            {% endif %}
-    
-        </div>
-    
-    
+{% block title %}My Subjects - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">menu_book</span></span>
+            <span>My Subjects</span>
+        </h1>
         {% if subjects %}
-    
-        <div class="subjects-grid">
-    
-            {% for fs in subjects %}
-    
-            <div class="subject-card">
-    
-                <div class="subject-header">
-    
-                    <h2>
-                        {{ fs.subject.name }}
-                    </h2>
-    
-                </div>
-    
-                <div class="subject-body">
-    
-                    <p>
-                        <strong>Department:</strong>
-                        {{ fs.subject.academic_class.department.name }}
-                    </p>
-    
-                    <p>
-                        <strong>Class:</strong>
-                        {{ fs.subject.academic_class }}
-                    </p>
-    
-                </div>
-    
-                <div class="subject-footer">
-    
-                    <a href="#">
-                        📋 Attendance
-                    </a>
-    
-                    <a href="#">
-                        📝 Assignments
-                    </a>
-    
-                </div>
-    
+            <div class="count-badge">
+                {{ subjects|length }} Subject{{ subjects|length|pluralize }}
             </div>
-    
-            {% endfor %}
-    
-        </div>
-    
-        {% else %}
-    
-        <div class="empty-state">
-    
-            <div class="empty-icon">
-                📚
-            </div>
-    
-            <div class="empty-title">
-                No Subjects Assigned
-            </div>
-    
-            <div class="empty-text">
-                Your assigned subjects will appear here.
-            </div>
-    
-        </div>
-    
         {% endif %}
-    
-    </main>
-    
-    </body>
+    </div>
+
+    {% if subjects %}
+        <div class="subjects-grid" style="margin-bottom: 2rem;">
+            {% for fs in subjects %}
+                <div class="subject-card">
+                    <div class="subject-icon"><span class="material-symbols-outlined">menu_book</span></div>
+                    <div class="subject-header" style="border: none; padding-bottom: 0;">
+                        <h2>{{ fs.subject.name }}</h2>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.25rem;">
+                        <p><strong>Department:</strong> {{ fs.subject.academic_class.department.name }}</p>
+                        <p><strong>Class:</strong> {{ fs.subject.academic_class }}</p>
+                    </div>
+                    <div class="subject-footer" style="display: flex; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                        <a href="{% url 'faculty_view_attendance' %}" style="color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.85rem;">📋 Attendance</a>
+                        <a href="{% url 'faculty_assignments' %}" style="color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.85rem;"><span class="material-symbols-outlined">description</span> Assignments</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">menu_book</span></div>
+            <h3 class="empty-title">No Subjects Assigned</h3>
+            <p class="empty-text">Your assigned subjects will appear here.</p>
+        </div>
+    {% endif %}
+{% endblock %}

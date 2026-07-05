@@ -1,89 +1,41 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_dashboard' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-    
-            <button class="theme-toggle" id="themeToggle">
-                🌙
-            </button>
-        </div>
-    </nav>
-    
-    <main class="container">
-    
-        <div class="page-header">
-            <h1>📅 My Timetable</h1>
-            <p>Weekly Class Schedule</p>
-        </div>
-    
-        {% if timetable_entries %}
-    
+{% block title %}My Timetable - CampusOne{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">calendar_today</span></span>
+            <span>My Timetable</span>
+        </h1>
+        <p>Weekly Class Schedule</p>
+    </div>
+
+    {% if timetable_entries %}
         <div class="timetable-list">
-    
             {% for lecture in timetable_entries %}
-    
             <div class="subject-card">
-    
                 <div class="subject-header">
-    
                     <div>
-    
-                        <h2>
-                            {{ lecture.faculty_subject.subject.name }}
-                        </h2>
-    
-                        <p>
-                            {{ lecture.day }}
-                        </p>
-    
+                        <h2>{{ lecture.faculty_subject.subject.name }}</h2>
+                        <p>{{ lecture.day }}</p>
                     </div>
-    
                     <span class="badge">
-    
-                        {{ lecture.start_time }}
-                        -
-                        {{ lecture.end_time }}
-    
+                        {{ lecture.start_time }} - {{ lecture.end_time }}
                     </span>
-    
                 </div>
-    
                 <div class="subject-footer">
-    
-                    👨‍🏫
-                    {{ lecture.faculty_subject.faculty.full_name }}
-    
+                    <span><span class="material-symbols-outlined">co_present</span></span>
+                    <span>{{ lecture.faculty_subject.faculty.full_name }}</span>
                 </div>
-    
             </div>
-    
             {% endfor %}
-    
         </div>
-    
-        {% else %}
-    
+    {% else %}
         <div class="empty-state">
-    
-            <div class="empty-icon">
-                📅
-            </div>
-    
-            <div class="empty-text">
-    
-                No timetable has been published yet.
-    
-            </div>
-    
+            <div class="empty-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+            <div class="empty-title">No Timetable Available</div>
+            <div class="empty-text">No timetable slots have been published yet for your class.</div>
         </div>
-    
-        {% endif %}
-    
-    </main>
-    
-    </body>
+    {% endif %}
+{% endblock %}

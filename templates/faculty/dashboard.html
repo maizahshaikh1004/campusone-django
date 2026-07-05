@@ -1,484 +1,182 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-    
-            <div class="logo">
-                <span class="logo-icon">👨‍🏫</span>
-                <span>CampusOne</span>
-            </div>
-    
-            <div class="nav-actions">
-    
-                <a href="{% url 'profile' %}" class="nav-link">
-                    Profile
-                </a>
-    
-                <a href="{% url 'logout' %}" class="nav-link">
-                    Logout
-                </a>
-    
-            </div>
-    
-        </div>
-    </nav>
-    
-    
-    <main class="container">
-    
-        <!-- Welcome Banner -->
-    
-        <div class="welcome-banner">
-    
-            <div class="welcome-content">
-    
-                <h1>
-                    👋 Welcome back, {{ name }}!
-                </h1>
-    
-                <p>
-                    Manage your classes, assignments and events.
-                </p>
-    
-            </div>
-    
-        </div>
-    
-    
-        <!-- Dashboard Cards -->
-    
-        <div class="stats-grid">
-    
-            <!-- Subjects -->
-    
-            <div class="stat-card subjects"
-                 onclick="location.href='{% url 'faculty_subjects' %}'">
-    
-                <div class="stat-header">
-                    <div class="stat-icon blue">📚</div>
-                </div>
-    
-                <div class="stat-label">
-                    Subjects
-                </div>
-    
-                <div class="stat-value">
-                    {{ total_subjects }}
-                </div>
-    
-                <div class="stat-subtitle">
-                    Teaching
-                </div>
-    
-            </div>
-    
-    
-            <!-- Assignments -->
-    
-            <div class="stat-card assignments"
-                 onclick="location.href='{% url 'faculty_assignments' %}'">
-    
-                <div class="stat-header">
-                    <div class="stat-icon pink">📝</div>
-                </div>
-    
-                <div class="stat-label">
-                    Assignments
-                </div>
-    
-                <div class="stat-value">
-                    {{ total_assignments }}
-                </div>
-    
-                <div class="stat-subtitle">
-                    Created
-                </div>
-    
-            </div>
-    
-    
-            <!-- Pending Submissions -->
-    
-            <div class="stat-card attendance"
-                 onclick="location.href='{% url 'faculty_submissions' %}'">
-    
-                <div class="stat-header">
-                    <div class="stat-icon orange">📥</div>
-                </div>
-    
-                <div class="stat-label">
-                    Pending
-                </div>
-    
-                <div class="stat-value">
-                    {{ pending_submissions }}
-                </div>
-    
-                <div class="stat-subtitle">
-                    Student submissions
-                </div>
-    
-            </div>
-    
-    
-            <!-- Notices -->
-    
-            <div class="stat-card notices"
-                 onclick="location.href='{% url 'faculty_notices' %}'">
-    
-                <div class="stat-header">
-                    <div class="stat-icon green">📢</div>
-                </div>
-    
-                <div class="stat-label">
-                    Notices
-                </div>
-    
-                <div class="stat-value">
-                    {{ total_notices }}
-                </div>
-    
-                <div class="stat-subtitle">
-                    Created
-                </div>
-    
-            </div>
-    
-    
-            <!-- Events -->
-    
-            <div class="stat-card timetable"
-                 onclick="location.href='{% url 'faculty_events' %}'">
-    
-                <div class="stat-header">
-                    <div class="stat-icon indigo">🎉</div>
-                </div>
-    
-                <div class="stat-label">
-                    Events
-                </div>
-    
-                <div class="stat-value">
-                    {{ total_events }}
-                </div>
-    
-                <div class="stat-subtitle">
-                    In-charge
-                </div>
-    
-            </div>
-    
-            <!-- Timetable -->
-            <div class="stat-card timetable-schedule"
-                 onclick="location.href='{% url 'faculty_timetable' %}'">
-                <div class="stat-header">
-                    <div class="stat-icon purple" style="background-color: #f3e8ff; color: #7c3aed;">🗓️</div>
-                </div>
-                <div class="stat-label">
-                    Timetable
-                </div>
-                <div class="stat-value" style="font-size: 1.5rem;">
-                    View
-                </div>
-                <div class="stat-subtitle">
-                    My Schedule
-                </div>
-            </div>
-    
-        </div>
-    
-    
-        <!-- Quick Actions / Attendance Module -->
-        <div class="section-header" style="margin-top: 40px; margin-bottom: 15px;">
-            <h2 class="activity-title" style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                <span>⚡</span> Quick Actions & Attendance
-            </h2>
+{% block title %}Faculty Dashboard - CampusOne{% endblock %}
+
+{% block logo_link %}
+<div class="logo">
+    <span class="logo-icon"><span class="material-symbols-outlined">co_present</span></span>
+    <span>CampusOne</span>
+</div>
+{% endblock %}
+
+{% block content %}
+    <!-- Welcome Banner -->
+    <div class="card" style="background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: white; padding: 2rem; border: none; margin-bottom: 2.5rem;">
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: white;"><span class="material-symbols-outlined">handshake</span> Welcome back, {{ name }}!</h1>
+        <p style="opacity: 0.9; margin-top: 0.5rem; font-size: 0.95rem;">Manage your classes, assignments, and events.</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="stats-grid">
+        <!-- Subjects -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_subjects' %}'" style="cursor: pointer;">
+            <div class="stat-icon blue"><span class="material-symbols-outlined">menu_book</span></div>
+            <span class="stat-label">Subjects</span>
+            <span class="stat-value">{{ total_subjects }}</span>
+            <span class="stat-subtitle">Teaching</span>
         </div>
 
-        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 40px;">
-            <a href="{% url 'mark_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
-                <div class="stat-icon green" style="margin: 0 auto 10px; background-color: #dcfce7; color: #15803d;">✓</div>
-                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Mark Attendance</div>
-                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Record daily presence</div>
-            </a>
-
-            <a href="{% url 'faculty_view_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
-                <div class="stat-icon blue" style="margin: 0 auto 10px; background-color: #dbeafe; color: #1d4ed8;">📊</div>
-                <div class="stat-label" style="font-weight: 600; color: #1f2937;">View Attendance</div>
-                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">View past records</div>
-            </a>
-
-            <a href="{% url 'faculty_attendance_report' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
-                <div class="stat-icon orange" style="margin: 0 auto 10px; background-color: #ffedd5; color: #c2410c;">📈</div>
-                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Attendance Report</div>
-                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Check percentage statistics</div>
-            </a>
-
-            <a href="{% url 'request_attendance_correction' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
-                <div class="stat-icon purple" style="margin: 0 auto 10px; background-color: #f3e8ff; color: #7c3aed;">🛠️</div>
-                <div class="stat-label" style="font-weight: 600; color: #1f2937;">Corrections</div>
-                <div class="stat-subtitle" style="font-size: 0.8rem; color: #6b7280; font-weight: normal;">Request changes</div>
-            </a>
+        <!-- Assignments -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_assignments' %}'" style="cursor: pointer;">
+            <div class="stat-icon pink"><span class="material-symbols-outlined">description</span></div>
+            <span class="stat-label">Assignments</span>
+            <span class="stat-value">{{ total_assignments }}</span>
+            <span class="stat-subtitle">Created</span>
         </div>
-    
-        <!-- Activity Section -->
-    
-        <div class="activity-section">
-    
-    
-            <!-- Recent Assignments -->
-    
-            <div class="activity-card">
-    
-                <div class="activity-header">
-    
-                    <h2 class="activity-title">
-                        Recent Assignments
-                    </h2>
-    
-                    <a href="{% url 'faculty_assignments' %}"
-                       class="view-all-link">
-    
-                        View All →
-    
-                    </a>
-    
-                </div>
-    
-    
+
+        <!-- Pending Submissions -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_submissions' %}'" style="cursor: pointer;">
+            <div class="stat-icon amber"><span class="material-symbols-outlined">download</span></div>
+            <span class="stat-label">Pending</span>
+            <span class="stat-value">{{ pending_submissions }}</span>
+            <span class="stat-subtitle">Student submissions</span>
+        </div>
+
+        <!-- Notices -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_notices' %}'" style="cursor: pointer;">
+            <div class="stat-icon green"><span class="material-symbols-outlined">campaign</span></div>
+            <span class="stat-label">Notices</span>
+            <span class="stat-value">{{ total_notices }}</span>
+            <span class="stat-subtitle">Created</span>
+        </div>
+
+        <!-- Events -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_events' %}'" style="cursor: pointer;">
+            <div class="stat-icon indigo"><span class="material-symbols-outlined">celebration</span></div>
+            <span class="stat-label">Events</span>
+            <span class="stat-value">{{ total_events }}</span>
+            <span class="stat-subtitle">In-charge</span>
+        </div>
+
+        <!-- Timetable -->
+        <div class="stat-card" onclick="location.href='{% url 'faculty_timetable' %}'" style="cursor: pointer;">
+            <div class="stat-icon purple" style="background-color: var(--accent-light); color: var(--accent);"><span class="material-symbols-outlined">calendar_month</span></div>
+            <span class="stat-label">Timetable</span>
+            <span class="stat-value" style="font-size: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">View</span>
+            <span class="stat-subtitle">My Schedule</span>
+        </div>
+    </div>
+
+    <!-- Quick Actions / Attendance Module -->
+    <div style="margin-top: 2.5rem; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+            <span><span class="material-symbols-outlined">bolt</span></span> Quick Actions & Attendance
+        </h2>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+        <a href="{% url 'mark_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+            <div class="stat-icon green" style="margin: 0 auto 0.5rem; background-color: var(--success-bg); color: var(--success);"><span class="material-symbols-outlined">check_circle</span></div>
+            <div class="stat-label" style="font-weight: 600; color: var(--text-primary);">Mark Attendance</div>
+            <div class="stat-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal; margin-top: 0.25rem;">Record daily presence</div>
+        </a>
+
+        <a href="{% url 'faculty_view_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+            <div class="stat-icon blue" style="margin: 0 auto 0.5rem; background-color: var(--accent-light); color: var(--accent);"><span class="material-symbols-outlined">bar_chart</span></div>
+            <div class="stat-label" style="font-weight: 600; color: var(--text-primary);">View Attendance</div>
+            <div class="stat-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal; margin-top: 0.25rem;">View past records</div>
+        </a>
+
+        <a href="{% url 'faculty_attendance_report' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+            <div class="stat-icon amber" style="margin: 0 auto 0.5rem; background-color: var(--warning-bg); color: var(--warning);"><span class="material-symbols-outlined">trending_up</span></div>
+            <div class="stat-label" style="font-weight: 600; color: var(--text-primary);">Attendance Report</div>
+            <div class="stat-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal; margin-top: 0.25rem;">Check percentage statistics</div>
+        </a>
+
+        <a href="{% url 'request_attendance_correction' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
+            <div class="stat-icon purple" style="margin: 0 auto 0.5rem; background-color: #ede9fe; color: #7c3aed;"><span class="material-symbols-outlined">construction</span></div>
+            <div class="stat-label" style="font-weight: 600; color: var(--text-primary);">Corrections</div>
+            <div class="stat-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal; margin-top: 0.25rem;">Request changes</div>
+        </a>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="recent-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        <!-- Recent Assignments -->
+        <div class="recent-card">
+            <div class="recent-header">
+                <h3>Recent Assignments</h3>
+                <a href="{% url 'faculty_assignments' %}" class="view-all-link">View All →</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
                 {% for assignment in recent_assignments %}
-    
-                <a href="#"
-                   class="activity-item">
-    
-                    <div class="activity-item-content">
-    
-                        <div class="activity-info">
-    
-                            <div class="activity-item-title">
-    
-                                {{ assignment.title }}
-    
-                            </div>
-    
-                            <div class="activity-item-meta">
-    
-                                <span>📚</span>
-    
-                                <span>
-    
-                                    {{ assignment.faculty_subject.subject.name }}
-    
-                                </span>
-    
-                            </div>
-    
-                            <div class="activity-item-meta">
-    
-                                <span>📅</span>
-    
-                                <span>
-    
-                                    Due:
-                                    {{ assignment.due_date }}
-    
-                                </span>
-    
-                            </div>
-    
+                    <div class="recent-item" style="padding: 1rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-bottom: none;">
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span class="user-name" style="font-weight: 700; color: var(--text-primary);">{{ assignment.title }}</span>
+                            <span class="muted" style="font-size: 0.8rem; color: var(--text-secondary);"><span class="material-symbols-outlined">menu_book</span> {{ assignment.faculty_subject.subject.name }}</span>
+                            <span class="muted" style="font-size: 0.8rem; color: var(--text-secondary);"><span class="material-symbols-outlined">calendar_today</span> Due: {{ assignment.due_date|date:"d M Y" }}</span>
                         </div>
-    
-                        <span class="activity-badge badge-pending">
-    
-                            Active
-    
-                        </span>
-    
+                        <span class="badge" style="background-color: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 600;">Active</span>
                     </div>
-    
-                </a>
-    
                 {% empty %}
-    
-                <div class="empty-state">
-    
-                    <div class="empty-icon">
-                        📝
+                    <div class="empty-state" style="padding: 2rem 1rem;">
+                        <div class="empty-icon"><span class="material-symbols-outlined">description</span></div>
+                        <h3 class="empty-title">No Assignments</h3>
+                        <p class="empty-text">You haven't created any assignments yet.</p>
                     </div>
-    
-                    <div class="empty-text">
-    
-                        No assignments created yet.
-    
-                    </div>
-    
-                </div>
-    
                 {% endfor %}
-    
-            </div>
-    
-    
-    
-            <!-- Upcoming Events -->
-    
-            <div class="activity-card">
-    
-                <div class="activity-header">
-    
-                    <h2 class="activity-title">
-    
-                        Upcoming Events
-    
-                    </h2>
-    
-                    <a href="{% url 'faculty_events' %}"
-                       class="view-all-link">
-    
-                        View All →
-    
-                    </a>
-    
-                </div>
-    
-    
-                {% for event in upcoming_events %}
-    
-                <a href="{% url 'event_detail' event.id %}"
-                   class="activity-item">
-    
-                    <div class="activity-item-content">
-    
-                        <div class="activity-info">
-    
-                            <div class="activity-item-title">
-    
-                                {{ event.title }}
-    
-                            </div>
-    
-                            <div class="activity-item-meta">
-    
-                                <span>📅</span>
-    
-                                <span>
-    
-                                    {{ event.event_date }}
-    
-                                </span>
-    
-                            </div>
-    
-                            <div class="activity-item-meta">
-    
-                                <span>📍</span>
-    
-                                <span>
-    
-                                    {{ event.venue }}
-    
-                                </span>
-    
-                            </div>
-    
-                        </div>
-    
-                        <span class="activity-badge badge-event">
-    
-                            Event
-    
-                        </span>
-    
-                    </div>
-    
-                </a>
-    
-                {% empty %}
-    
-                <div class="empty-state">
-    
-                    <div class="empty-icon">
-    
-                        🎉
-    
-                    </div>
-    
-                    <div class="empty-text">
-    
-                        No upcoming events.
-    
-                    </div>
-    
-                </div>
-    
-                {% endfor %}
-    
-            </div>
-
-            <!--Recent Notices Card-->
-
-            <div class="activity-card">
-
-                <div class="activity-header">
-            
-                    <h2 class="activity-title">
-                        Recent Notices
-                    </h2>
-            
-                    <a href="{% url 'faculty_notices' %}"
-                       class="view-all-link">
-                        View All →
-                    </a>
-            
-                </div>
-            
-                {% for notice in recent_notices %}
-            
-                <div class="activity-item">
-            
-                    <div class="activity-item-content">
-            
-                        <div class="activity-info">
-            
-                            <div class="activity-item-title">
-                                {{ notice.title }}
-                            </div>
-            
-                            <div class="activity-item-meta">
-                                <span>📅</span>
-                                <span>{{ notice.created_at|date:"d M Y" }}</span>
-                            </div>
-            
-                        </div>
-            
-                        <span class="activity-badge badge-event">
-                            {{ notice.notice_type }}
-                        </span>
-            
-                    </div>
-            
-                </div>
-            
-                {% empty %}
-            
-                <div class="empty-state">
-            
-                    <div class="empty-icon">
-                        📢
-                    </div>
-            
-                    <div class="empty-text">
-                        No notices created yet.
-                    </div>
-            
-                </div>
-            
-                {% endfor %}
-            
             </div>
         </div>
-    
-    </main>
-    
-    </body>
+
+        <!-- Upcoming Events -->
+        <div class="recent-card">
+            <div class="recent-header">
+                <h3>Upcoming Events</h3>
+                <a href="{% url 'faculty_events' %}" class="view-all-link">View All →</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                {% for event in upcoming_events %}
+                    <a href="{% url 'event_detail' event.id %}" class="recent-item" style="padding: 1rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-bottom: none; text-decoration: none; transition: border-color 0.2s;">
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span class="user-name" style="font-weight: 700; color: var(--text-primary);">{{ event.title }}</span>
+                            <span class="muted" style="font-size: 0.8rem; color: var(--text-secondary);"><span class="material-symbols-outlined">calendar_today</span> {{ event.event_date|date:"d M Y" }}</span>
+                            <span class="muted" style="font-size: 0.8rem; color: var(--text-secondary);"><span class="material-symbols-outlined">location_on</span> {{ event.venue }}</span>
+                        </div>
+                        <span class="badge" style="background-color: var(--success-bg); color: var(--success); font-size: 0.75rem; font-weight: 600;">Event</span>
+                    </a>
+                {% empty %}
+                    <div class="empty-state" style="padding: 2rem 1rem;">
+                        <div class="empty-icon"><span class="material-symbols-outlined">celebration</span></div>
+                        <h3 class="empty-title">No Events</h3>
+                        <p class="empty-text">No upcoming events found.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Notices -->
+        <div class="recent-card" style="grid-column: 1 / -1;">
+            <div class="recent-header">
+                <h3>Recent Notices</h3>
+                <a href="{% url 'faculty_notices' %}" class="view-all-link">View All →</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                {% for notice in recent_notices %}
+                    <div class="recent-item" style="padding: 1rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-bottom: none;">
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span class="user-name" style="font-weight: 700; color: var(--text-primary);">{{ notice.title }}</span>
+                            <span class="muted" style="font-size: 0.8rem; color: var(--text-secondary);"><span class="material-symbols-outlined">calendar_today</span> {{ notice.created_at|date:"d M Y" }}</span>
+                        </div>
+                        <span class="badge" style="background-color: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 600;">{{ notice.notice_type }}</span>
+                    </div>
+                {% empty %}
+                    <div class="empty-state" style="padding: 2rem 1rem;">
+                        <div class="empty-icon"><span class="material-symbols-outlined">campaign</span></div>
+                        <h3 class="empty-title">No Notices</h3>
+                        <p class="empty-text">No notices posted recently.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

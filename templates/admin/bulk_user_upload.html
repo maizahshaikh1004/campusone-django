@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk User Upload - CampusOne Admin{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">upload</span></span>
+            <span>Bulk User Upload</span>
+        </h1>
+        <p>Import students and faculty list directly using CSV or Excel file formats</p>
+    </div>
+
+    <!-- Error state -->
+    {% if error %}
+        <div class="message-toast error">
+            <span>⚠️</span>
+            <span>{{ error }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="card" style="max-width: 780px; margin: 0 auto 2rem auto;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="file-upload-area" id="dropzone" style="margin-bottom: 1.5rem; position: relative;">
+                <input type="file" id="fileInput" name="file" accept=".csv, .xlsx, .xls" required style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+                <div class="upload-icon"><span class="material-symbols-outlined">folder</span></div>
+                <div class="upload-text">Drag & drop your file here, or click to browse</div>
+                <div class="upload-hint">Supports CSV, XLSX, and XLS formats</div>
+                <div class="file-name" id="fileLabel" style="display: none; margin-top: 1rem;"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <span>Upload & Import Users</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Format Hint -->
+    <div class="template-hint" style="max-width: 780px; margin: 0 auto;">
+        <h3>
+            <span><span class="material-symbols-outlined">info</span></span>
+            <span>Expected File Column Headers Structure:</span>
+        </h3>
+        <div class="col-tags">
+            <span class="col-tag">name</span>
+            <span class="col-tag">email</span>
+            <span class="col-tag">role (STUDENT / FACULTY)</span>
+            <span class="col-tag">department_id</span>
+            <span class="col-tag">class_id (Required for Students)</span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// File input selection preview
+const fileInput = document.getElementById('fileInput');
+const fileLabel = document.getElementById('fileLabel');
+const dropzone = document.getElementById('dropzone');
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileLabel.textContent = `Selected File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        fileLabel.style.display = 'block';
+        dropzone.style.borderColor = '#10b981';
+        dropzone.style.backgroundColor = 'var(--success-bg)';
+    }
+});
+</script>
+{% endblock %}

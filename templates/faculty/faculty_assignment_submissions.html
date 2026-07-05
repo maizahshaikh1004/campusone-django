@@ -1,21 +1,19 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_dashboard' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Dashboard</span>
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}Assignment Submissions - Faculty - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'faculty_dashboard' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Dashboard</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>📥</span>
+            <span><span class="material-symbols-outlined">download</span></span>
             <span>Assignment Submissions</span>
         </h1>
     </div>
@@ -36,56 +34,54 @@
     </div>
 
     {% if selected_assignment_id %}
-
         <!-- Filter Panel -->
         <div class="filter-panel">
             <div class="student-count">
-                <span>📊 Total Students:</span>
+                <span><span class="material-symbols-outlined">bar_chart</span> Total Students:</span>
                 <span class="count-num" id="totalCount">{{ total_students }}</span>
             </div>
             <div class="filter-tabs">
                 <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="ontime">✓ On Time</button>
-                <button class="filter-tab" data-filter="late">⏰ Late</button>
-                <button class="filter-tab" data-filter="pending">⏳ Pending</button>
+                <button class="filter-tab" data-filter="ontime"><span class="material-symbols-outlined">check_circle</span> On Time</button>
+                <button class="filter-tab" data-filter="late"><span class="material-symbols-outlined">schedule</span> Late</button>
+                <button class="filter-tab" data-filter="pending"><span class="material-symbols-outlined">pending_actions</span> Pending</button>
             </div>
         </div>
 
         <!-- Submissions List -->
         <div class="submissions-list">
-
             <!-- Submitted Students -->
             {% for s in submissions %}
                 <div class="submission-card" data-status="{% if s.is_late %}late{% else %}ontime{% endif %}">
-                    <div class="card-header">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                         <div class="student-info">
                             <div>
                                 <span class="student-avatar">{{ s.student.full_name|slice:":1"|upper }}</span>
                                 <span class="student-name">{{ s.student.full_name }}</span>
                             </div>
-                            <div class="student-id">ID: {{ s.student.id }}</div>
-                            <div class="submission-time">
-                                <span>📅</span>
+                            <div class="student-id" style="margin-left: 2.75rem; margin-top: -0.5rem;">ID: {{ s.student.id }}</div>
+                            <div class="submission-time" style="margin-left: 2.75rem; margin-top: 0.25rem;">
+                                <span><span class="material-symbols-outlined">calendar_today</span></span>
                                 <span>Submitted: {{ s.submitted_at|date:"d M Y" }}</span>
                             </div>
                         </div>
 
                         {% if s.is_late %}
                             <span class="status-badge badge-late">
-                                <span>⏰</span>
+                                <span><span class="material-symbols-outlined">schedule</span></span>
                                 <span>Late</span>
                             </span>
                         {% else %}
                             <span class="status-badge badge-ontime">
-                                <span>✓</span>
+                                <span><span class="material-symbols-outlined">check_circle</span></span>
                                 <span>On Time</span>
                             </span>
                         {% endif %}
                     </div>
 
                     {% if s.submission_file %}
-                        <a href="{{ s.submission_file.url }}" target="_blank" class="btn-view">
-                            <span>📄</span>
+                        <a href="{{ s.submission_file.url }}" target="_blank" class="btn btn-secondary" style="margin-top: auto; padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-self: flex-start;">
+                            <span><span class="material-symbols-outlined">draft</span></span>
                             <span>View Submission</span>
                         </a>
                     {% endif %}
@@ -95,21 +91,21 @@
             <!-- Pending Students -->
             {% for p in pending_students %}
                 <div class="submission-card" data-status="pending">
-                    <div class="card-header">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                         <div class="student-info">
                             <div>
-                                <span class="student-avatar">{{ p.full_name|slice:":1"|upper }}</span>
+                                <span class="student-avatar" style="background-color: var(--warning-bg); color: var(--warning);">{{ p.full_name|slice:":1"|upper }}</span>
                                 <span class="student-name">{{ p.full_name }}</span>
                             </div>
-                            <div class="student-id">ID: {{ p.id }}</div>
-                            <div class="submission-time">
+                            <div class="student-id" style="margin-left: 2.75rem; margin-top: -0.5rem;">ID: {{ p.id }}</div>
+                            <div class="submission-time" style="margin-left: 2.75rem; margin-top: 0.25rem; color: var(--error);">
                                 <span>⚠️</span>
                                 <span>Not Submitted Yet</span>
                             </div>
                         </div>
 
                         <span class="status-badge badge-pending">
-                            <span>⏳</span>
+                            <span><span class="material-symbols-outlined">pending_actions</span></span>
                             <span>Pending</span>
                         </span>
                     </div>
@@ -119,41 +115,42 @@
             {% if not submissions and not pending_students %}
                 <div class="empty-state">
                     <div class="empty-icon">📭</div>
-                    <h3>No Students Found</h3>
-                    <p>No students enrolled for this assignment.</p>
+                    <h3 class="empty-title">No Students Found</h3>
+                    <p class="empty-text">No students enrolled for this assignment.</p>
                 </div>
             {% endif %}
-
         </div>
-
     {% endif %}
-</main>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-// Filter tabs
-const filterTabs = document.querySelectorAll('.filter-tab');
-const cards = document.querySelectorAll('.submission-card');
-const countNum = document.getElementById('totalCount');
+document.addEventListener('DOMContentLoaded', () => {
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const cards = document.querySelectorAll('.submission-card');
+    const countNum = document.getElementById('totalCount');
 
-filterTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        // Update active tab
-        filterTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active tab
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
 
-        // Filter cards
-        const filter = tab.dataset.filter;
-        let visibleCount = 0;
+            // Filter cards
+            const filter = tab.dataset.filter;
+            let visibleCount = 0;
 
-        cards.forEach(card => {
-            const status = card.dataset.status;
-            const isVisible = (filter === 'all') || (status === filter);
-            card.style.display = isVisible ? 'block' : 'none';
-            if (isVisible) visibleCount++;
+            cards.forEach(card => {
+                const status = card.dataset.status;
+                const isVisible = (filter === 'all') || (status === filter);
+                card.style.display = isVisible ? 'flex' : 'none';
+                if (isVisible) visibleCount++;
+            });
+
+            // Update count
+            if (countNum) countNum.textContent = visibleCount;
         });
-
-        // Update count
-        if (countNum) countNum.textContent = visibleCount;
     });
 });
 </script>
+{% endblock %}

@@ -1,21 +1,19 @@
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'faculty_events' %}" class="back-link">
-            <span>←</span>
-            <span>Back to Events</span>
-        </a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span>
-        </button>
-    </div>
-</nav>
+{% extends 'base.html' %}
 
-<!-- Main -->
-<main class="container">
+{% block title %}Assign Coordinators - CampusOne{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'faculty_events' %}" class="back-link">
+    <span>←</span>
+    <span>Back to Events</span>
+</a>
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
-            <span>👥</span>
+            <span><span class="material-symbols-outlined">groups</span></span>
             <span>Assign Coordinators</span>
         </h1>
         <p>Manage student coordinators for your event (Max 2)</p>
@@ -27,41 +25,46 @@
         </div>
     {% endif %}
 
-    <!-- Assigned List -->
-    <div class="assigned-section">
-        <h3>Assigned Coordinators ({{ assigned|length }}/2)</h3>
+    <div class="card" style="padding: 2rem; max-width: 600px; margin: 0 auto;">
+        <!-- Assigned List -->
+        <h3 style="font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            Assigned Coordinators ({{ assigned|length }}/2)
+        </h3>
         {% if assigned %}
             <div class="coordinators-list">
                 {% for coord in assigned %}
                     <div class="coordinator-chip">
-                        <span>👤 {{ coord.student.full_name }}</span>
-                        <form method="post" style="display:inline; margin-left:10px;">
+                        <span><span class="material-symbols-outlined">person</span> {{ coord.student.full_name }}</span>
+                        <form method="post" style="display: inline; margin-left: 0.5rem;">
                             {% csrf_token %}
                             <input type="hidden" name="remove_id" value="{{ coord.student.id }}">
-                            <button type="submit" class="btn-remove-coord" onclick="return confirm('Remove this coordinator?');">✕</button>
+                            <button type="submit" class="btn-remove-coord" onclick="return confirm('Remove this coordinator?');"><span class="material-symbols-outlined">close</span></button>
                         </form>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p>No coordinators assigned yet.</p>
+            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 2rem;">No coordinators assigned yet.</p>
+        {% endif %}
+
+        <!-- Assign Form -->
+        {% if assigned|length < 2 %}
+            <form method="post" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="student">Select Student</label>
+                    <select name="student_id" id="student" required>
+                        <option value="">— Select Student —</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">
+                    <span><span class="material-symbols-outlined">add</span></span>
+                    <span>Add Coordinator</span>
+                </button>
+            </form>
         {% endif %}
     </div>
-
-    <!-- Assign Form -->
-    {% if assigned|length < 2 %}
-        <form method="post" class="assign-form" style="margin-top: 30px;">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="student">Select Student</label>
-                <select name="student_id" id="student" required>
-                    <option value="">— Select Student —</option>
-                    {% for student in students %}
-                        <option value="{{ student.id }}">{{ student.full_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn-submit">Add Coordinator</button>
-        </form>
-    {% endif %}
-</main>
+{% endblock %}

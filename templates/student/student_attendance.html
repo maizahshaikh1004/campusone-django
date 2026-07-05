@@ -1,89 +1,76 @@
-<body>
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{% url 'student_dashboard' %}" class="back-link">
-                <span>←</span>
-                <span>Back to Dashboard</span>
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon">🌙</span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Main -->
-    <main class="container">
-    
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>
-                <span>📊</span>
-                <span>My Attendance</span>
-            </h1>
-            <p>Track your attendance across all subjects</p>
-        </div>
-    
-        <!-- Overall Stats -->
-        {% if attendance_data %}
-        <div class="overall-stats">
-            <div class="overall-stats-content" style="justify-content: center;">
-                <div class="stat-item">
-                    <div class="stat-label">Total Subjects</div>
-                    <div class="stat-value">{{ attendance_data|length }}</div>
-                </div>
+{% block title %}My Attendance - CampusOne{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span><span class="material-symbols-outlined">bar_chart</span></span>
+            <span>My Attendance</span>
+        </h1>
+        <p>Track your attendance across all subjects</p>
+    </div>
+
+    <!-- Overall Stats -->
+    {% if attendance_data %}
+    <div class="overall-stats">
+        <div class="overall-stats-content">
+            <div class="stat-item">
+                <div class="stat-label">Total Subjects</div>
+                <div class="stat-value" style="font-size: 1.75rem;">{{ attendance_data|length }}</div>
             </div>
         </div>
-        {% endif %}
-    
-        <!-- Subjects List -->
-        <div class="subjects-list">
-            {% for a in attendance_data %}
-            <div class="subject-card {% if a.percentage >= 75 %}good{% elif a.percentage >= 50 %}warning{% else %}critical{% endif %}">
-                
-                <div class="subject-header">
-                    <div class="subject-info">
-                        <a href="{% url 'student_attendance_detail' a.subject_id %}" class="subject-name">
-                            {{ a.subject_name }}
-                        </a>
-                        <div class="subject-meta">
-                            <span>📚</span>
-                            <span>{{ a.present }} / {{ a.total }} lectures attended</span>
-                        </div>
-                    </div>
-                    <div class="percentage-badge">{{ a.percentage }}%</div>
-                </div>
-    
-                <div class="progress-section">
-                    <div class="progress-bar-container">
-                        <div class="progress-bar {% if a.percentage >= 75 %}progress-good{% elif a.percentage >= 50 %}progress-warning{% else %}progress-critical{% endif %}"
-                             style="width: {{ a.percentage }}%">
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="subject-footer">
-                    {% if a.percentage >= 75 %}
-                        <span class="status-badge badge-good">✓ Good Standing</span>
-                    {% elif a.percentage >= 50 %}
-                        <span class="status-badge badge-warning">⚠️ Need Improvement</span>
-                    {% else %}
-                        <span class="status-badge badge-critical">🔴 Critical</span>
-                    {% endif %}
-                    
-                    <a href="{% url 'student_attendance_detail' a.subject_id %}" class="view-details">
-                        View Details →
+    </div>
+    {% endif %}
+
+    <!-- Subjects List -->
+    <div class="subjects-list">
+        {% for a in attendance_data %}
+        <div class="subject-card {% if a.percentage >= 75 %}good{% elif a.percentage >= 50 %}warning{% else %}critical{% endif %}">
+            
+            <div class="subject-header" style="width: 100%;">
+                <div class="subject-info">
+                    <a href="{% url 'student_attendance_detail' a.subject_id %}" class="subject-name">
+                        {{ a.subject_name }}
                     </a>
+                    <div class="subject-meta" style="margin-top: 0.25rem;">
+                        <span><span class="material-symbols-outlined">menu_book</span></span>
+                        <span>{{ a.present }} / {{ a.total }} lectures attended</span>
+                    </div>
                 </div>
-    
+                <div class="percentage-badge">{{ a.percentage }}%</div>
             </div>
-            {% empty %}
-            <div class="empty-state">
-                <div class="empty-icon">📊</div>
-                <div class="empty-text">No attendance data available yet</div>
+
+            <div class="progress-section" style="margin-top: 1rem; margin-bottom: 1rem;">
+                <div class="progress-bar-container">
+                    <div class="progress-bar {% if a.percentage >= 75 %}progress-good{% elif a.percentage >= 50 %}progress-warning{% else %}progress-critical{% endif %}"
+                         style="width: {{ a.percentage }}%">
+                    </div>
+                </div>
             </div>
-            {% endfor %}
+
+            <div class="subject-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                {% if a.percentage >= 75 %}
+                    <span class="status-badge badge-good"><span class="material-symbols-outlined">check_circle</span> Good Standing</span>
+                {% elif a.percentage >= 50 %}
+                    <span class="status-badge badge-warning">⚠️ Need Improvement</span>
+                {% else %}
+                    <span class="status-badge badge-critical">🔴 Critical Standing</span>
+                {% endif %}
+                
+                <a href="{% url 'student_attendance_detail' a.subject_id %}" class="view-details">
+                    View Details →
+                </a>
+            </div>
+
         </div>
-    
-    </main>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon"><span class="material-symbols-outlined">bar_chart</span></div>
+            <div class="empty-title">No Attendance Records</div>
+            <div class="empty-text">No attendance data is available for your account yet.</div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
