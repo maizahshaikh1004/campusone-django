@@ -144,7 +144,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL="/media/"
-MEDIA_ROOT=BASE_DIR / "media"
+if os.environ.get('VERCEL') == '1':
+    MEDIA_ROOT = '/tmp'
+else:
+    MEDIA_ROOT=BASE_DIR / "media"
 
 # Email Configuration
 '''if DEBUG:
