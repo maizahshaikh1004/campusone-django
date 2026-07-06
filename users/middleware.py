@@ -8,8 +8,11 @@ class ProfileCreationMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             try:
-                # Access the profile to trigger the DoesNotExist exception if it's missing
-                _ = request.user.profile
+                profile = request.user.profile
+                # Auto-heal: If user is superuser but role is not ADMIN, update it
+                if request.user.is_superuser and profile.role != 'ADMIN':
+                    profile.role = 'ADMIN'
+                    profile.save()
             except Profile.DoesNotExist:
                 role = 'ADMIN' if request.user.is_superuser else 'STUDENT'
                 Profile.objects.create(
