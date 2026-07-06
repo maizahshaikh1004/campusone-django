@@ -95,6 +95,7 @@ if os.environ.get('VERCEL') == '1':
         conn_max_age=600,
         ssl_require=True
     )
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
