@@ -88,8 +88,8 @@ DATABASES = {
     }
 }
 
-# Switch to Vercel/Neon Postgres in production (when VERCEL env is set to 1)
-if os.environ.get('VERCEL') == '1':
+# Switch to Vercel/Neon Postgres in production (when VERCEL env is set to 1 and POSTGRES_URL is available)
+if os.environ.get('VERCEL') == '1' and os.environ.get('POSTGRES_URL'):
     DATABASES['default'] = dj_database_url.config(
         default=os.environ.get('POSTGRES_URL'),
         conn_max_age=600,
