@@ -18,7 +18,7 @@
         <div class="profile-header">
             <div class="avatar-container">
                 {% if profile and profile.profile_photo %}
-                    <img src="/media/{{ profile.profile_photo.url }}" class="avatar" alt="Profile photo">
+                    <img src="{{ profile.profile_photo.url }}" class="avatar" alt="Profile photo">
                 {% else %}
                     <div class="no-avatar">{{ profile.full_name|slice:":1"|upper }}</div>
                 {% endif %}
