@@ -74,7 +74,7 @@
         </h2>
     </div>
 
-    <div class="stats-grid" style="grid-template-columns: repeat(3, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
         <a href="{% url 'mark_attendance' %}" class="stat-card" style="text-decoration: none; text-align: center; padding: 1.25rem;">
             <div class="stat-icon green" style="margin: 0 auto 0.5rem; background-color: var(--success-bg); color: var(--success);"><span class="material-symbols-outlined">check_circle</span></div>
             <div class="stat-label" style="font-weight: 600; color: var(--text-primary);">Mark Attendance</div>
