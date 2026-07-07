@@ -233,14 +233,16 @@ def approve_registration_view(request, request_id):
     req.reviewed_at = timezone.now()
     req.save()
 
-    # Send password setup email
     try:
         subject = "CampusOne Account Activation & Password Setup"
+        domain = request.get_host()
+        protocol = "https" if request.is_secure() else "http"
+        activation_link = f"{protocol}://{domain}/set-password/{user.id}/"
         message = (
             f"Dear {req.name},\n\n"
             f"Your registration request for the role of {req.role.title()} has been approved.\n"
             f"Please click the following link to set your password and activate your account:\n"
-            f"http://127.0.0.1:8000/set-password/{user.id}/\n\n"
+            f"{activation_link}\n\n"
             f"Best regards,\n"
             f"CampusOne Administration"
         )

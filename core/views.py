@@ -549,11 +549,14 @@ def bulk_user_upload(request):
                 profile.save()
 
                 subject = "CampusOne Account Activation & Password Setup"
+                domain = request.get_host()
+                protocol = "https" if request.is_secure() else "http"
+                activation_link = f"{protocol}://{domain}/set-password/{user.id}/"
                 message = (
                     f"Dear {name},\n\n"
                     f"An account has been created for you by the Administrator with the role of {role.title()}.\n"
                     f"Please click the following link to set your password and activate your account:\n"
-                    f"http://127.0.0.1:8000/set-password/{user.id}/\n\n"
+                    f"{activation_link}\n\n"
                     f"Best regards,\n"
                     f"CampusOne Administration"
                 )

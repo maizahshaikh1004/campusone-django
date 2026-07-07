@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CampusOne - Campus Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 
 <style>
 * {
@@ -428,7 +429,7 @@ body.dark-mode .theme-toggle:hover {
 }
 
 .info-list li::before {
-    content: "<span class="material-symbols-outlined">check_circle</span>";
+    content: "✓";
     color: #2563eb;
     font-weight: 700;
     font-size: 1.25rem;
@@ -669,10 +670,13 @@ body.dark-mode .indicator.active {
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <div class="logo">CampusOne</div>
+        <div class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="font-size: 1.75rem; color: #2563eb;">school</span>
+            <span>CampusOne</span>
+        </div>
         <div class="nav-buttons">
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span id="themeIcon"><span class="material-symbols-outlined">dark_mode</span></span>
+                <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
             </button>
             <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
             <a href="{% url 'register_request' %}" class="btn btn-primary">Get Started</a>
@@ -811,7 +815,7 @@ const body = document.body;
 const currentTheme = localStorage.getItem('theme') || 'light';
 if (currentTheme === 'dark') {
     body.classList.add('dark-mode');
-    themeIcon.textContent = '<span class="material-symbols-outlined">light_mode</span>';
+    themeIcon.textContent = 'light_mode';
 }
 
 // Toggle theme on button click
@@ -820,10 +824,10 @@ themeToggle.addEventListener('click', () => {
     
     // Update icon and save preference
     if (body.classList.contains('dark-mode')) {
-        themeIcon.textContent = '<span class="material-symbols-outlined">light_mode</span>';
+        themeIcon.textContent = 'light_mode';
         localStorage.setItem('theme', 'dark');
     } else {
-        themeIcon.textContent = '<span class="material-symbols-outlined">dark_mode</span>';
+        themeIcon.textContent = 'dark_mode';
         localStorage.setItem('theme', 'light');
     }
 });

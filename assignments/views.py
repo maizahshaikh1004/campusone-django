@@ -73,16 +73,18 @@ def submit_assignment(request, assignment_id):
     ).first()
 
     if request.method == "POST" and submission is None:
-
-        AssignmentSubmission.objects.create(
-            assignment=assignment,
-            student=profile,
-            submission_file=request.FILES["submission_file"]
-        )
-
-        return redirect(
-            "student_assignments"
-        )
+        try:
+            AssignmentSubmission.objects.create(
+                assignment=assignment,
+                student=profile,
+                submission_file=request.FILES["submission_file"]
+            )
+            messages.success(request, "Assignment submitted successfully.")
+            return redirect(
+                "student_assignments"
+            )
+        except ValidationError as e:
+            messages.error(request, e.messages[0] if hasattr(e, 'messages') else str(e))
 
     return render(
         request,
@@ -163,26 +165,21 @@ def create_assignment(request):
             faculty=profile
         )
 
-        Assignment.objects.create(
-
-            faculty_subject=faculty_subject,
-
-            title=request.POST.get("title"),
-
-            description=request.POST.get("description"),
-
-            due_date=request.POST.get("due_date"),
-
-            question_file=request.FILES.get("question_file")
-
-        )
-
-        messages.success(
-            request,
-            "Assignment created successfully."
-        )
-
-        return redirect("faculty_assignments")
+        try:
+            Assignment.objects.create(
+                faculty_subject=faculty_subject,
+                title=request.POST.get("title"),
+                description=request.POST.get("description"),
+                due_date=request.POST.get("due_date"),
+                question_file=request.FILES.get("question_file")
+            )
+            messages.success(
+                request,
+                "Assignment created successfully."
+            )
+            return redirect("faculty_assignments")
+        except ValidationError as e:
+            messages.error(request, e.messages[0] if hasattr(e, 'messages') else str(e))
 
     return render(
         request,

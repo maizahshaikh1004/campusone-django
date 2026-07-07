@@ -83,14 +83,14 @@
                     <span><span class="material-symbols-outlined">campaign</span></span>
                     <span>Share Event</span>
                 </div>
-                <textarea class="share-textarea" id="shareText" rows="7" readonly><span class="material-symbols-outlined">campaign</span> EVENT ALERT
+                <textarea class="share-textarea" id="shareText" rows="7" readonly>📢 EVENT ALERT:
 
-<span class="material-symbols-outlined">track_changes</span> {{ event.title }}
-<span class="material-symbols-outlined">location_on</span> {{ event.venue }}
+🎯 {{ event.title }}
+📍 {{ event.venue }}
 🗓 {{ event.event_date|date:"d M Y" }}
-<span class="material-symbols-outlined">schedule</span> {{ event.start_time }} – {{ event.end_time }}
+⏰ {{ event.start_time }} – {{ event.end_time }}
 
-<span class="material-symbols-outlined">description</span> Register here:
+📝 Register here:
 {{ event.google_form_link }}</textarea>
 
                 <div class="share-actions">
@@ -99,7 +99,7 @@
                         <span>Copy Message</span>
                     </button>
                     <a class="btn" style="background-color: #25d366; color: white; flex: 1;"
-                       href="https://wa.me/?text={{ event.title|urlencode }}%0A<span class="material-symbols-outlined">location_on</span>{{ event.venue|urlencode }}%0A🗓{{ event.event_date|date:'d M Y'|urlencode }}%0A{{ event.google_form_link|urlencode }}"
+                       href="https://wa.me/?text=📢%20EVENT%20ALERT%3A%0A%0A🎯%20{{ event.title|urlencode }}%0A📍%20{{ event.venue|urlencode }}%0A🗓%20{{ event.event_date|date:'d M Y'|urlencode }}%0A⏰%20{{ event.start_time|urlencode }}%20–%20{{ event.end_time|urlencode }}%0A%0A📝%20Register%20here%3A%0A{{ event.google_form_link|urlencode }}"
                        target="_blank">
                         <span><span class="material-symbols-outlined">chat</span></span>
                         <span>WhatsApp</span>

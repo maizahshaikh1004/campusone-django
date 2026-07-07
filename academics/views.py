@@ -308,11 +308,9 @@ def student_timetable(request):
             },
             status=403
         )
-
     timetable_entries = (
         Timetable.objects.filter(
-            faculty_subject__subject__academic_class=
-            profile.academic_class
+            faculty_subject__subject__academic_class=profile.academic_class
         )
         .select_related(
             "faculty_subject",
@@ -325,11 +323,38 @@ def student_timetable(request):
         )
     )
 
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    day_map = {d.upper(): d for d in days}
+
+    timetable = {}
+    time_slots = []
+
+    for entry in timetable_entries:
+        start_str = entry.start_time.strftime('%H:%M')
+        end_str = entry.end_time.strftime('%H:%M')
+        slot = f"{start_str}-{end_str}"
+
+        if slot not in timetable:
+            timetable[slot] = {}
+            time_slots.append(slot)
+
+        display_day = day_map.get(entry.day, entry.day)
+        timetable[slot][display_day] = f"{entry.faculty_subject.subject.name} ({entry.faculty_subject.faculty.full_name})"
+
+    grid = []
+    for slot in time_slots:
+        row = {
+            'time': slot,
+            'cells': [timetable.get(slot, {}).get(day, '---') for day in days]
+        }
+        grid.append(row)
+
     return render(
         request,
         "student/student_timetable.html",
         {
-            "timetable_entries": timetable_entries
+            "days": days,
+            "grid": grid
         }
     )
 

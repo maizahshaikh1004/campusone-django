@@ -3,6 +3,7 @@
 {% block title %}My Timetable - CampusOne{% endblock %}
 
 {% block content %}
+    <!-- Page Header -->
     <div class="page-header">
         <h1>
             <span><span class="material-symbols-outlined">calendar_today</span></span>
@@ -11,25 +12,37 @@
         <p>Weekly Class Schedule</p>
     </div>
 
-    {% if timetable_entries %}
-        <div class="timetable-list">
-            {% for lecture in timetable_entries %}
-            <div class="subject-card">
-                <div class="subject-header">
-                    <div>
-                        <h2>{{ lecture.faculty_subject.subject.name }}</h2>
-                        <p>{{ lecture.day }}</p>
-                    </div>
-                    <span class="badge">
-                        {{ lecture.start_time }} - {{ lecture.end_time }}
-                    </span>
-                </div>
-                <div class="subject-footer">
-                    <span><span class="material-symbols-outlined">co_present</span></span>
-                    <span>{{ lecture.faculty_subject.faculty.full_name }}</span>
-                </div>
-            </div>
-            {% endfor %}
+    {% if grid %}
+        <!-- Timetable Grid -->
+        <div class="table-responsive" style="margin-bottom: 2rem;">
+            <table class="timetable-grid">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Time</th>
+                        {% for day in days %}
+                            <th>{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in grid %}
+                        <tr>
+                            <td class="time-slot"><strong>{{ row.time }}</strong></td>
+                            {% for cell in row.cells %}
+                                <td>
+                                    {% if cell != '---' %}
+                                        <div class="timetable-card">
+                                            {{ cell }}
+                                        </div>
+                                    {% else %}
+                                        <span class="empty-slot">—</span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% else %}
         <div class="empty-state">
