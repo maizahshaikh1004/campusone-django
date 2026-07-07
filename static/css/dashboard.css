@@ -2343,6 +2343,7 @@ th {
 
 .filters-form {
     display: flex;
+    flex-direction: row;
     gap: 1.5rem;
     align-items: flex-end;
     flex-wrap: wrap;
