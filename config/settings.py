@@ -31,6 +31,9 @@ ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
 # Add CSRF trusted origins for Vercel
 CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app']
 
+# Secret code for registering as an Administrator on the web onboarding page
+ADMIN_SIGNUP_SECRET = os.environ.get('ADMIN_SIGNUP_SECRET', 'CampusOneAdmin2026')
+
 # Application definition
 
 INSTALLED_APPS = [

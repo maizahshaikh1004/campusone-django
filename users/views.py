@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import RegistrationRequest, Profile
 from django.core.mail import send_mail
+from django.conf import settings
 
 def register_request(request):
     if request.method=="POST":
@@ -272,3 +273,52 @@ def reject_registration_view(request, request_id):
 
     messages.success(request, f"Registration request for {req.name} has been rejected.")
     return redirect('admin_registration_requests')
+
+
+def register_admin(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        invite_code = request.POST.get("invite_code")
+
+        if not all([name, email, username, password, confirm_password, invite_code]):
+            messages.error(request, "All fields are required.")
+            return render(request, "users/register_admin.html")
+
+        if invite_code != settings.ADMIN_SIGNUP_SECRET:
+            messages.error(request, "Invalid invite code.")
+            return render(request, "users/register_admin.html")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, "users/register_admin.html")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return render(request, "users/register_admin.html")
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return render(request, "users/register_admin.html")
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_active=True,
+            is_staff=True,
+            is_superuser=True
+        )
+
+        profile = user.profile
+        profile.full_name = name
+        profile.role = "ADMIN"
+        profile.save()
+
+        messages.success(request, "Administrator account created successfully! You can now log in.")
+        return redirect("login")
+
+    return render(request, "users/register_admin.html")

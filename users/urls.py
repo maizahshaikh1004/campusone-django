@@ -8,6 +8,11 @@ urlpatterns=[
         name="register_request"
     ),
     path(
+        "register-admin/",
+        views.register_admin,
+        name="register_admin"
+    ),
+    path(
         "set-password/<int:user_id>/",
         views.set_password,
         name="set_password"
