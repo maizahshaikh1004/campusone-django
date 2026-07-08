@@ -146,11 +146,27 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL="/media/"
+MEDIA_URL = "/media/"
+
 if os.environ.get('VERCEL') == '1':
-    MEDIA_ROOT = '/tmp'
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": os.environ.get("SUPABASE_ACCESS_KEY_ID"),
+                "secret_key": os.environ.get("SUPABASE_SECRET_ACCESS_KEY"),
+                "bucket_name": os.environ.get("SUPABASE_STORAGE_BUCKET", "media"),
+                "endpoint_url": os.environ.get("SUPABASE_S3_ENDPOINT"),
+                "default_acl": None,
+                "querystring_auth": False,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
 else:
-    MEDIA_ROOT=BASE_DIR / "media"
+    MEDIA_ROOT = BASE_DIR / "media"
 
 # Email Configuration
 '''if DEBUG:
