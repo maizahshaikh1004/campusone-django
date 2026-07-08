@@ -2682,3 +2682,102 @@ th {
     color: var(--success);
     margin-bottom: 1.5rem;
 }
+
+/* ==========================================================================
+   Mobile Responsiveness & Media Queries
+   ========================================================================== */
+
+/* Responsive Grid Classes */
+.stats-grid-admin {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.categories-container-responsive {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.student-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+/* Tablet Media Query (Max Width: 992px) */
+@media (max-width: 992px) {
+    .stats-grid-admin {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile Media Query (Max Width: 768px) */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .nav-container {
+        padding: 1rem 1.25rem;
+    }
+    
+    .logo span {
+        font-size: 1.1rem;
+    }
+    
+    .categories-container-responsive {
+        grid-template-columns: 1fr;
+    }
+    
+    .student-dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* Small Mobile Media Query (Max Width: 600px) */
+@media (max-width: 600px) {
+    .back-link span:not(.material-symbols-outlined) {
+        display: none;
+    }
+    
+    .back-link {
+        padding: 0.5rem;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-grid-admin {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+        min-width: 0;
+    }
+    
+    .filters-form > div[style*="display: flex"] {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .filters-form > div[style*="display: flex"] button,
+    .filters-form > div[style*="display: flex"] a {
+        flex: 1;
+        text-align: center;
+    }
+}
