@@ -149,14 +149,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = "/media/"
 
 if os.environ.get('VERCEL') == '1':
+    bucket_name = os.environ.get("SUPABASE_STORAGE_BUCKET", "media")
+    endpoint_url = os.environ.get("SUPABASE_S3_ENDPOINT", "")
+    if "supabase.co" in endpoint_url:
+        try:
+            project_ref = endpoint_url.split("//")[1].split(".")[0]
+            custom_domain = f"{project_ref}.supabase.co/storage/v1/object/public/{bucket_name}"
+        except Exception:
+            custom_domain = None
+    else:
+        custom_domain = None
+
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
                 "access_key": os.environ.get("SUPABASE_ACCESS_KEY_ID"),
                 "secret_key": os.environ.get("SUPABASE_SECRET_ACCESS_KEY"),
-                "bucket_name": os.environ.get("SUPABASE_STORAGE_BUCKET", "media"),
-                "endpoint_url": os.environ.get("SUPABASE_S3_ENDPOINT"),
+                "bucket_name": bucket_name,
+                "endpoint_url": endpoint_url,
+                "custom_domain": custom_domain,
                 "default_acl": None,
                 "querystring_auth": False,
             },
