@@ -8,8 +8,8 @@ The application is architected to run serverlessly on **Vercel** backed by a **S
 
 ## 🚀 Live Demo
 
-* **URL**: `https://your-vercel-app.vercel.app`
-* **Admin Onboarding URL**: `https://your-vercel-app.vercel.app/register-admin/` (Requires the secret invite code)
+* **URL**: `https://campusone-django.vercel.app`
+* **Admin Onboarding URL**: `https://campusone-django.vercel.app/register-admin/` (Requires the secret invite code i.e CampusOneAdmin2026)  
 
 ---
 
@@ -53,7 +53,7 @@ Follow these steps to run CampusOne locally on your machine:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/campusone-django.git
+git clone https://github.com/maizahshaikh1004/campusone-django.git
 cd campusone-django
 ```
 
